@@ -13,7 +13,7 @@ const operatorScreen = ({ navigation, route }) => {
     {
       title: "Give Feedback",
       icon: "comment-outline",
-      action: () => navigation.navigate("Feedback"),
+      action: () => navigation.navigate("feedback", { role }),
     },
     {
       title: "Report Missing Items",
@@ -28,12 +28,44 @@ const operatorScreen = ({ navigation, route }) => {
     {
       title: "View Notifications",
       icon: "bell-outline",
-      action: () => navigation.navigate("Notifications"),
+      action: () => navigation.navigate("notification", { role }),
     },
     {
       title: "Profile",
       icon: "account-circle-outline",
-      action: () => navigation.navigate("profileoperator", { role }),
+      action: () => navigation.navigate("profileop", { role }),
+    },
+  ];
+  const driverMenuItems = [
+    {
+      title: "Closest Bus Station",
+      icon: "map-marker-radius",
+      action: () => navigation.navigate("ClosestBusStation"),
+    },
+    {
+      title: "Give Feedback",
+      icon: "comment-outline",
+      action: () => navigation.navigate("feedback"),
+    },
+    {
+      title: "Report Missing Items",
+      icon: "alert-circle-outline",
+      action: () => navigation.navigate("ReportMissing"),
+    },
+    {
+      title: "View Bus Schedule",
+      icon: "calendar-clock",
+      action: () => navigation.navigate("busSchedule"),
+    },
+    {
+      title: "View Notifications",
+      icon: "bell-outline",
+      action: () => navigation.navigate("notification", { role }),
+    },
+    {
+      title: "Profile",
+      icon: "account-circle-outline",
+      action: () => navigation.navigate("profileop", { role }),
     },
   ];
   const operatorMenuItems = [
@@ -48,9 +80,9 @@ const operatorScreen = ({ navigation, route }) => {
       action: () => navigation.navigate("ReportMissing"),
     },
     {
-      title: "Notify Students",
+      title: "View feedback",
       icon: "message-alert-outline",
-      action: () => navigation.navigate("NotifyStudents"),
+      action: () => navigation.navigate("feedback", { role }),
     },
     {
       title: "Evaluate Drivers",
@@ -58,14 +90,14 @@ const operatorScreen = ({ navigation, route }) => {
       action: () => navigation.navigate("EvaluateDrivers"),
     },
     {
-      title: "View Notifications",
+      title: "Notify Students",
       icon: "bell-ring-outline",
-      action: () => navigation.navigate("Notifications"),
+      action: () => navigation.navigate("notification" , { role }),
     },
     {
       title: "Profile",
       icon: "account-circle-outline",
-      action: () => navigation.navigate("Profileoperator", { role }),
+      action: () => navigation.navigate("profileop", { role }),
     },
   ];
   
@@ -78,7 +110,13 @@ const operatorScreen = ({ navigation, route }) => {
 const formatRole=(role)=>{
   return role.charAt(0).toUpperCase()+role.slice(1).toLowerCase();
 };
-  const menuItems = role === "OPERATOR" ? operatorMenuItems : studentMenuItems;
+  const menuItems =role === "OPERATOR"
+  ? operatorMenuItems
+  : role === "DRIVER"
+  ? driverMenuItems
+  : role === "STUDENT"
+  ? studentMenuItems
+  : [];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -86,10 +124,10 @@ const formatRole=(role)=>{
        <View style={styles.topBar}>
         <Text style={styles.appName}>HUrry</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+          <TouchableOpacity onPress={() => navigation.navigate("notification", {role})}>
             <Icon name="bell-outline" size={25} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile", { role })} style={{ marginLeft: 15 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
             <Icon name="account-circle-outline" size={25} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -231,8 +269,12 @@ const styles = StyleSheet.create({
     height: 60,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
-    marginHorizontal: -20,
-    marginVertical:75,
+    //marginHorizontal: -20,
+    //marginVertical:75,
+    position: 'absolute', // جعله ثابتًا
+  bottom: 0, // وضعه في الأسفل
+  left: 0,
+  right: 0,
   },
   navItem: {
     flex: 1,

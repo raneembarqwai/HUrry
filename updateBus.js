@@ -7,10 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const updateBus = ({ route }) => {
+const updateBus = ({ route, navigation }) => {
   const { scheduleId, numberOfBuses } = route.params;
 
   const [busData, setBusData] = useState(
@@ -28,7 +29,7 @@ const updateBus = ({ route }) => {
   useEffect(() => {
     const loadSavedData = async () => {
       try {
-        //const storedData = await AsyncStorage.getItem('busData');
+        const storedData = await AsyncStorage.getItem('busData');
         if (storedData) {
           setSavedData(JSON.parse(storedData));
         }
@@ -46,30 +47,56 @@ const updateBus = ({ route }) => {
   };
 
   const saveUpdates = async () => {
+    
+    const isAnyFieldEmpty = busData.some(bus => 
+      !bus.Driver_name || !bus.Arrival_Time || !bus.Departure_Time || !bus.Driver_Email
+    );
+
+    if (isAnyFieldEmpty) {
+      Alert.alert('Error', 'Please fill all fields before saving.');
+      return;
+    }
+
     try {
-      await AsyncStorage.setItem(`busData`, JSON.stringify(busData));
+      // الرابط الثابت للـ API
+      const databaseUrl = 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/buses/add'; // ضع رابط الـ API هنا
+
+      // إرسال البيانات إلى قاعدة البيانات
+      const response = await fetch(databaseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(busData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      await AsyncStorage.setItem('busData', JSON.stringify(busData));
       setSavedData(busData);
-      console.log('Updated bus data:', busData);
+      Alert.alert('Success', 'Bus data saved successfully!');
     } catch (error) {
       console.log('Error saving data:', error);
+      Alert.alert('Error', 'Failed to save bus data.');
     }
   };
 
   return (
     <View style={styles.container}>
       {/* top*/}
-            <View style={styles.topBar}>
-                    <Text style={styles.appName}>HUrry</Text>
-                    <View style={styles.iconContainer}>
-                      <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-                        <Icon name="bell-outline" size={25} color="#fff" />
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
-                        <Icon name="account-circle-outline" size={25} color="#fff" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
+      <View style={styles.topBar}>
+        <Text style={styles.appName}>HUrry</Text>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+            <Icon name="bell-outline" size={25} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
+            <Icon name="account-circle-outline" size={25} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <Text style={styles.header}>Update Bus Information</Text>
 
@@ -89,30 +116,33 @@ const updateBus = ({ route }) => {
                 style={styles.input}
                 value={bus.Driver_name}
                 onChangeText={(text) => updateBusStatus(index, 'Driver_name', text)}
+                placeholder="Driver Name"
               />
               <TextInput
                 style={styles.input}
                 value={bus.Arrival_Time}
                 onChangeText={(text) => updateBusStatus(index, 'Arrival_Time', text)}
+                placeholder="Arrival Time"
               />
               <TextInput
                 style={styles.input}
                 value={bus.Departure_Time}
                 onChangeText={(text) => updateBusStatus(index, 'Departure_Time', text)}
+                placeholder="Departure Time"
               />
-               <TextInput
+              <TextInput
                 style={styles.input}
                 value={bus.Driver_Email}
                 onChangeText={(text) => updateBusStatus(index, 'Driver_Email', text)}
+                placeholder="Driver Email"
               />
             </View>
           ))}
         </View>
 
         {/* saving schedule*/}
-        
         {savedData.length > 0 && (
-         <View style={styles.table}>
+          <View style={styles.table}>
             <Text style={styles.savedHeader}>Saved Bus Information</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -139,25 +169,26 @@ const updateBus = ({ route }) => {
           <Text style={styles.buttonText}>Save Updates</Text>
         </TouchableOpacity>
       </ScrollView>
-            {/* bottom*/}
-          <View style={styles.bottomNav}>
-                 <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.navItem}>
-                   <Icon name="home-outline" size={25} color="#59B3F8" />
-                   <Text style={styles.navText}>Home</Text>
-                 </TouchableOpacity>
-                 <TouchableOpacity onPress={() => navigation.navigate("BusSchedule")} style={styles.navItem}>
-                   <Icon name="calendar-clock" size={25} color="#59B3F8" />
-                   <Text style={styles.navText}>Schedule</Text>
-                 </TouchableOpacity>
-                 <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
-                   <Icon name="comment-outline" size={25} color="#59B3F8" />
-                   <Text style={styles.navText}>Feedback</Text>
-                 </TouchableOpacity>
-                 <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
-                   <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
-                   <Text style={styles.navText}>Missing</Text>
-                 </TouchableOpacity>
-               </View>
+
+      {/* bottom*/}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.navItem}>
+          <Icon name="home-outline" size={25} color="#59B3F8" />
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("BusSchedule")} style={styles.navItem}>
+          <Icon name="calendar-clock" size={25} color="#59B3F8" />
+          <Text style={styles.navText}>Schedule</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+          <Icon name="comment-outline" size={25} color="#59B3F8" />
+          <Text style={styles.navText}>Feedback</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+          <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
+          <Text style={styles.navText}>Missing</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -284,4 +315,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
+
 export default updateBus;

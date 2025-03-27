@@ -16,7 +16,7 @@ const loginScreen = ({ navigation }) => {
   
     try {
       // Make the API call to sign in
-      const response = await fetch("https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/api2/login", {
+      const response = await fetch("https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/api2/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const loginScreen = ({ navigation }) => {
       console.log("Token stored:", token);
   
       // Navigate to Home with the role
-      navigation.navigate("operator", { role });
+      navigation.navigate("operator", { role,token });
       Alert.alert("Success", "Signed in successfully!");
     } catch (error) {
       // Handle network errors

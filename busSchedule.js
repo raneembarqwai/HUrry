@@ -21,8 +21,8 @@ const busSchedule = () => {
   const loadSchedules = async () => {
     try {
       const url = selectedCity === 'Amman'
-        ? `https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/amman/Bus_Stations`
-        : `https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/zarqa/Bus_Stations`;
+        ? `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/amman/Bus_Stations`
+        : `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/zarqa/Bus_Stations`;
       
       const response = await fetch(url);
       const data = await response.json();

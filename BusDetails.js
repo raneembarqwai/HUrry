@@ -8,21 +8,34 @@ const BusDetails = ({ route, navigation }) => {
   const [busDetails, setBusDetails] = useState([]);
 
   useEffect(() => {
-    const loadBusDetails = async () => {
+    const fetchBusDetails = async () => {
       try {
+        // الرابط الثابت للـ API
+        const apiUrl = 'https://8516-2a01-9700-8003-b900-1106-e24a-d33e-b4fe.ngrok-free.app/'; // ضع رابط الـ API هنا
+
+        // جلب البيانات من الـ API
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Bus details fetched from API:', data); // التحقق من البيانات
+        setBusDetails(data);
+
+        // حفظ البيانات في AsyncStorage (اختياري)
+        await AsyncStorage.setItem('busData', JSON.stringify(data));
+      } catch (error) {
+        console.log('Error fetching bus details:', error);
+        // إذا فشل جلب البيانات من الـ API، حاول تحميل البيانات المحفوظة في AsyncStorage
         const storedData = await AsyncStorage.getItem('busData');
         if (storedData) {
-          const busData = JSON.parse(storedData);
-          console.log('Bus details loaded:', busData);  // التحقق من البيانات
-          setBusDetails(busData);
-        } else {
-          console.log('No bus data found in AsyncStorage');
+          setBusDetails(JSON.parse(storedData));
         }
-      } catch (error) {
-        console.log('Error loading bus details:', error);
       }
     };
-    loadBusDetails();
+
+    fetchBusDetails();
   }, []);
 
   return (

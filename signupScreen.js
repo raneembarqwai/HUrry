@@ -20,7 +20,7 @@ const signupScreen = ({ route, navigation }) => {
   const handleSignUp = async () => {
     console.log("Form Data being sent:", formData); // Log formData before the fetch call
     try {
-      const response = await fetch("https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/api/signup", {
+      const response = await fetch("https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

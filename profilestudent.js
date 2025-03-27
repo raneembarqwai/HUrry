@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
 const profilestudent = ({ route, navigation }) => {
-  // البيانات الأولية من قاعدة البيانات
+  
   const [studentData, setStudentData] = useState({
     fullName: '',
     email: '',
-    profilePicture: '', // رابط الصورة
+    profilePicture: '', 
   });
 
-  // استدعاء البيانات من قاعدة البيانات (محاكاة)
+  
   useEffect(() => {
-    // افترض أن البيانات تأتي من الـ API أو قاعدة البيانات
+   
     const fetchStudentData = async () => {
       const fakeData = {
         fullName: '',
         email: '',
-        profilePicture: 'https://via.placeholder.com/150', // صورة افتراضية
+        profilePicture: 'https://via.placeholder.com/150', 
       };
       setStudentData(fakeData);
     };
@@ -53,7 +53,7 @@ const profilestudent = ({ route, navigation }) => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => navigation.navigate('EditProfileScreen')} // شاشة تعديل البيانات
+          onPress={() => navigation.navigate('EditProfileScreen')} 
         >
           <Text style={styles.footerButtonText}>Edit Profile</Text>
         </TouchableOpacity>

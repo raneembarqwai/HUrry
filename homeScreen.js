@@ -21,10 +21,10 @@ const homeScreen = () => {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'STUDENT' })}>
         <Text style={styles.buttonText}>Student</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'DRIVER' })}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('operator', { role: 'DRIVER' })}>
         <Text style={styles.buttonText}>Driver</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'OPERATOR' })}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('operator', { role: 'OPERATOR' })}>
         <Text style={styles.buttonText}>Operator</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'ADMIN' })}>

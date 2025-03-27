@@ -14,8 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const API_URL = {
-  Zarqa: 'https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/zarqa/add',
-  Amman:  'https://2e63-2a01-9700-8094-5a00-8869-3d0a-3a26-1e20.ngrok-free.app/amman/add',
+  Zarqa: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/zarqa/add',
+  Amman:  'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/amman/add',
 }
 
 const updateschedule = () => {
@@ -472,12 +472,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#fff',
-    height: 58,
+    height: 60,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
-    marginHorizontal: -20,
-    marginTop: 'auto', 
-    marginVertical: 0, 
+    //marginHorizontal: -20,
+    //marginTop: 'auto', 
+   //marginVertical: 0, 
+    position: 'absolute', // جعله ثابتًا
+  bottom: 0, // وضعه في الأسفل
+  left: 0,
+  right: 0,
   },
   navItem: {
     flex: 1,

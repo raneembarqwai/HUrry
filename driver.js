@@ -82,14 +82,14 @@ const [menuVisible, setMenuVisible] = useState(false);
       </View>
       <View style={styles.lowerHalf}>
       <View style={styles.row}>
-        {/* الأزرار الأربعة الأولى في الصف العلوي */}
+       
         <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Button 1</Text></TouchableOpacity>
         <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Button 2</Text></TouchableOpacity>
         
       </View>
 
       <View style={styles.row}>
-        {/* الأزرار الأربعة الثانية في الصف السفلي */}
+       
         <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Button 5</Text></TouchableOpacity>
         <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Button 6</Text></TouchableOpacity>
         
