@@ -9,7 +9,9 @@ import {
   TouchableOpacity, 
   Alert, 
   ActivityIndicator,
-  ScrollView 
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -150,7 +152,20 @@ const feedback = ({ route, navigation }) => {
   );
 
   return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
+       {/* Top Bar */}
+                 <View style={styles.topBar}>
+                         <Text style={styles.appName}>HUrry</Text>
+                         <View style={styles.iconContainer}>
+                           <TouchableOpacity onPress={() => navigation.navigate("notification", { role })}>
+                             <Icon name="bell-outline" size={25} color="#fff" />
+                           </TouchableOpacity>
+                           <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
+                             <Icon name="account-circle-outline" size={25} color="#fff" />
+                           </TouchableOpacity>
+                         </View>
+                       </View>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>
@@ -160,7 +175,7 @@ const feedback = ({ route, navigation }) => {
 
       {loading && (
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#0000ff" />
+         <ActivityIndicator size="large" color="#59B3F8" />
         </View>
       )}
 
@@ -205,24 +220,53 @@ const feedback = ({ route, navigation }) => {
           }
         />
       )}
+       {/* Bottom Navigation */}
+                  <View style={styles.bottomNav}>
+                          <TouchableOpacity onPress={() => navigation.navigate("Home", { role })} style={styles.navItem}>
+                            <Icon name="home-outline" size={25} color="#59B3F8" />
+                            <Text style={styles.navText}>Home</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => navigation.navigate(role === "OPERATOR" ? 'updateschedule' : 'busSchedule')} style={styles.navItem}>
+                            <Icon name="calendar-clock" size={25} color="#59B3F8" />
+                            <Text style={styles.navText}>Schedule</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+                            <Icon name="comment-outline" size={25} color="#59B3F8" />
+                            <Text style={styles.navText}>Feedback</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+                            <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
+                            <Text style={styles.navText}>Missing</Text>
+                          </TouchableOpacity>
+                        </View>
+                      
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flexGrow: 1,
+    backgroundColor: "#f8ffff",
+    paddingHorizontal: 20,
+    paddingTop: 0,
   },
   header: {
-    backgroundColor: '#59B3F8',
-    padding: 15,
+    fontSize: 28,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#2C3E50',
+    marginTop: 20,
   },
   headerText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '600',
     textAlign: 'center',
+    marginBottom: 10,
+    color: '#2C3E50',
+    marginTop: 10,
   },
   loader: {
     position: 'absolute',
@@ -237,13 +281,33 @@ const styles = StyleSheet.create({
   },
   form: {
     padding: 15,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    
   },
   input: {
     borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     borderColor: '#ddd',
-    padding: 10,
+    padding: 15,
     marginBottom: 15,
-    borderRadius: 5,
+    borderRadius: 8,
+    backgroundColor: '#FCFCFC',
+    fontSize: 16,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginTop: 10,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    
   },
   multiline: {
     minHeight: 100,
@@ -276,6 +340,51 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: '#666',
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#59B3F8",
+    paddingVertical: 10,
+    paddingHorizontal:20,
+    marginHorizontal: -20,
+  },
+  appName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  iconContainer: {
+    flexDirection: "row",
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    height: 60,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    //marginHorizontal: -20,
+    //marginVertical:75,
+    position: 'absolute', // جعله ثابتًا
+    bottom: 0, // وضعه في الأسفل
+    left: 0,
+    right: 0,
+  },
+  navItem: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  navText: {
+    fontSize: 12,
+    color: '#59B3F8',
+    marginTop: 5,
+  },
+  role:{
+    color: "#59B3F8"
   },
 });
 

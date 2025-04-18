@@ -162,7 +162,7 @@ const profileoperator = ({ route, navigation }) => {
       case 'STUDENT':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}>Welcome, Student!</Text>
+            <Text style={styles.roleSpecificHeader}></Text>
             <Text style={styles.roleSpecificText}>Student Name:</Text>
             <TextInput
               style={styles.input}
@@ -193,7 +193,7 @@ const profileoperator = ({ route, navigation }) => {
       case 'DRIVER':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}>Welcome, Driver!</Text>
+            <Text style={styles.roleSpecificHeader}> </Text>
             <Text style={styles.roleSpecificText}>Driver Name:</Text>
             <TextInput
               style={styles.input}
@@ -224,7 +224,7 @@ const profileoperator = ({ route, navigation }) => {
       case 'OPERATOR':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}>Welcome, Operator!</Text>
+            <Text style={styles.roleSpecificHeader}></Text>
             <Text style={styles.roleSpecificText}>Operator Name:</Text>
             <TextInput
               style={styles.input}

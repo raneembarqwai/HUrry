@@ -28,7 +28,7 @@ const operatorScreen = ({ navigation, route }) => {
     {
       title: "View Notifications",
       icon: "bell-outline",
-      action: () => navigation.navigate("notification", { role,token }),
+      action: () => navigation.navigate("notification", { role}),
     },
     {
       title: "Profile",

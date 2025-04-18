@@ -43,7 +43,7 @@ const notification = ({ route, navigation }) => {
             const response = await fetch(API_URLS.OTHERS.GET, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -158,19 +158,19 @@ const notification = ({ route, navigation }) => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
             {/* Top Bar */}
-            <View style={styles.topBar}>
-                <Text style={styles.appName}>HUrry</Text>
-                <View style={styles.iconContainer}>
-                    <TouchableOpacity onPress={() => navigation.navigate("Notification", { role: userRole })}>
-                        <Icon name="bell-outline" size={25} color="#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Profile", { role: userRole })} style={{ marginLeft: 15 }}>
-                        <Icon name="account-circle-outline" size={25} color="#fff" />
-                    </TouchableOpacity>
-                </View>
-            </View>
+           <View style={styles.topBar}>
+                   <Text style={styles.appName}>HUrry</Text>
+                   <View style={styles.iconContainer}>
+                     <TouchableOpacity onPress={() => navigation.navigate("notification", { role })}>
+                       <Icon name="bell-outline" size={25} color="#fff" />
+                     </TouchableOpacity>
+                     <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
+                       <Icon name="account-circle-outline" size={25} color="#fff" />
+                     </TouchableOpacity>
+                   </View>
+                 </View>
 
-            <Text style={styles.title}>Welcome, {userRole}!</Text>
+            <Text style={styles.title}>Notification, {userRole}</Text>
 
             {loading && <ActivityIndicator size="large" color="#59B3F8" />}
 
@@ -198,9 +198,11 @@ const notification = ({ route, navigation }) => {
                         onChangeText={setMessage}
                         multiline
                     />
-                    <Button title="Send Notification" onPress={sendNotificationToRole} color="#4CAF50" />
+                    <Button title="Send Notification" onPress={sendNotificationToRole} color="#59B3F8" />
 
+                    <View style={styles.userSection}>
                     <Text style={styles.subtitle}>Send to User:</Text>
+
                     <TextInput
                         style={styles.input}
                         placeholder="Enter User ID"
@@ -215,7 +217,8 @@ const notification = ({ route, navigation }) => {
                         onChangeText={setUserMessage}
                         multiline
                     />
-                    <Button title="Send Notification" onPress={sendNotificationToUser} color="#4CAF50" />
+                    <Button title="Send Notification" onPress={sendNotificationToUser} color="#59B3F8" />
+                </View>
                 </View>
             ) : (
                 <View style={styles.dashboard}>
@@ -235,20 +238,24 @@ const notification = ({ route, navigation }) => {
 
             {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
-                <TouchableOpacity onPress={() => navigation.navigate("Home", { role: userRole })} style={styles.navItem}>
-                    <Icon name="home-outline" size={25} color="#59B3F8" />
-                    <Text style={styles.navText}>Home</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("Schedule", { role: userRole })} style={styles.navItem}>
-                    <Icon name="calendar-clock" size={25} color="#59B3F8" />
-                    <Text style={styles.navText}>Schedule</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("Contact")} style={styles.navItem}>
-                    <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
-                    <Text style={styles.navText}>Missing</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("Home", { role })} style={styles.navItem}>
+                      <Icon name="home-outline" size={25} color="#59B3F8" />
+                      <Text style={styles.navText}>Home</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate(role === "OPERATOR" ? 'updateschedule' : 'busSchedule')} style={styles.navItem}>
+                      <Icon name="calendar-clock" size={25} color="#59B3F8" />
+                      <Text style={styles.navText}>Schedule</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+                      <Icon name="comment-outline" size={25} color="#59B3F8" />
+                      <Text style={styles.navText}>Feedback</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+                      <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
+                      <Text style={styles.navText}>Missing</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
         </TouchableWithoutFeedback>
     );
 };
@@ -262,11 +269,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8ffff',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginVertical: 10,
-        color: '#333',
+        //fontSize: 24,
+       // fontWeight: 'bold',
+       // textAlign: 'center',
+       // marginVertical: 10,
+       // color: '#333',
+       fontSize: 28,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#2C3E50',
+    marginTop: 20,
     },
     dashboard: {
         backgroundColor: '#fff',
@@ -282,6 +295,10 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: 15,
         fontSize: 16,
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
     },
     subtitle: {
         fontSize: 18,
@@ -308,11 +325,13 @@ const styles = StyleSheet.create({
         color: '#888',
     },
     topBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#59B3F8',
-        padding: 15,
+        flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#59B3F8",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: -20,
     },
     appName: {
         fontSize: 20,
@@ -327,15 +346,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center',
         backgroundColor: '#fff',
-        paddingVertical: 10,
+        height: 60,
         borderTopWidth: 1,
-        borderTopColor: '#eee',
+        borderTopColor: '#e0e0e0',
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
     },
     navItem: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     navText: {
@@ -358,6 +379,12 @@ const styles = StyleSheet.create({
     },
     roleButtonText: {
         color: '#333',
+    },
+    userSection: {
+        marginTop: 10,  // يمكنك تعديل هذه القيمة حسب الحاجة
+        paddingTop: 20,  // مسافة داخلية من الأعلى
+        //borderTopWidth: 1,  // خط فاصل اختياري
+        borderTopColor: '#eee',  // لون الخط الفاصل
     },
 });
 
