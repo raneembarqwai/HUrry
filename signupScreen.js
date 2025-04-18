@@ -230,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default signupScreen;
+export default signupScreen

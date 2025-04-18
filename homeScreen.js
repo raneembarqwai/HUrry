@@ -18,7 +18,7 @@ const homeScreen = () => {
       <Text style={styles.subtitle}>How would you describe yourself?</Text>
 
       {/* Add your buttons here */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'STUDENT' })}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('operator', { role: 'STUDENT' })}>
         <Text style={styles.buttonText}>Student</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('operator', { role: 'DRIVER' })}>

@@ -25,11 +25,12 @@ const updateBus = ({ route, navigation }) => {
   );
 
   const [savedData, setSavedData] = useState([]);
+  const [token, setToken] = useState('');
 
   useEffect(() => {
     const loadSavedData = async () => {
       try {
-        const storedData = await AsyncStorage.getItem('busData');
+        //const storedData = await AsyncStorage.getItem('busData');
         if (storedData) {
           setSavedData(JSON.parse(storedData));
         }
@@ -37,7 +38,20 @@ const updateBus = ({ route, navigation }) => {
         console.log('Error loading saved data:', error);
       }
     };
+    
+    const loadToken = async () => {
+      try {
+        const authToken = await AsyncStorage.getItem('authToken');
+        if (authToken) {
+          setToken(authToken);
+        }
+      } catch (error) {
+        console.log('Error loading token:', error);
+      }
+    };
+    
     loadSavedData();
+    loadToken();
   }, []);
 
   const updateBusStatus = (index, field, value) => {
@@ -47,7 +61,6 @@ const updateBus = ({ route, navigation }) => {
   };
 
   const saveUpdates = async () => {
-    
     const isAnyFieldEmpty = busData.some(bus => 
       !bus.Driver_name || !bus.Arrival_Time || !bus.Departure_Time || !bus.Driver_Email
     );
@@ -58,14 +71,11 @@ const updateBus = ({ route, navigation }) => {
     }
 
     try {
-      // الرابط الثابت للـ API
-      const databaseUrl = 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/buses/add'; // ضع رابط الـ API هنا
-
-      // إرسال البيانات إلى قاعدة البيانات
-      const response = await fetch(databaseUrl, {
+      const response = await fetch('https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/buses/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(busData),
       });
@@ -74,7 +84,7 @@ const updateBus = ({ route, navigation }) => {
         throw new Error('Network response was not ok');
       }
 
-      await AsyncStorage.setItem('busData', JSON.stringify(busData));
+      //await AsyncStorage.setItem('busData', JSON.stringify(busData));
       setSavedData(busData);
       Alert.alert('Success', 'Bus data saved successfully!');
     } catch (error) {

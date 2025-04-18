@@ -11,7 +11,7 @@ const BusDetails = ({ route, navigation }) => {
     const fetchBusDetails = async () => {
       try {
         // الرابط الثابت للـ API
-        const apiUrl = 'https://8516-2a01-9700-8003-b900-1106-e24a-d33e-b4fe.ngrok-free.app/'; // ضع رابط الـ API هنا
+        const apiUrl = 'https://8516-2a01-9700-8003-b900-1106-e24a-d33e-b4fe.ngrok-free.app/buses/all'; // ضع رابط الـ API هنا
 
         // جلب البيانات من الـ API
         const response = await fetch(apiUrl);

@@ -54,7 +54,7 @@ const loginScreen = ({ navigation }) => {
       console.log("User signed in:", data);
       await AsyncStorage.setItem("authToken", token);
       console.log("Token stored:", token);
-  
+     // navigation.navigate("notification",{ role,token });
       // Navigate to Home with the role
       navigation.navigate("operator", { role,token });
       Alert.alert("Success", "Signed in successfully!");

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {
@@ -11,24 +10,46 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+
 const busSchedule = () => {
   const [schedules, setSchedules] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [showCityMenu, setShowCityMenu] = useState(false);
+  const [token, setToken] = useState('');
   const navigation = useNavigation();
  
   const cities = ['Amman', 'Zarqa'];
+
+  useEffect(() => {
+    const loadToken = async () => {
+      try {
+        const authToken = await AsyncStorage.getItem('authToken');
+        if (authToken) {
+          setToken(authToken);
+        }
+      } catch (error) {
+        console.log('Error loading token:', error);
+      }
+    };
+    loadToken();
+  }, []);
+
   const loadSchedules = async () => {
     try {
       const url = selectedCity === 'Amman'
         ? `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/amman/Bus_Stations`
         : `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/zarqa/Bus_Stations`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
       const data = await response.json();
       console.log("Fetched data from database:", data);
       // Save fetched data to local storage
-      await AsyncStorage.setItem(`Schedules_${selectedCity}`, JSON.stringify(data));
+     // await AsyncStorage.setItem(`Schedules_${selectedCity}`, JSON.stringify(data));
       setSchedules(data);
     } catch (error) {
       console.error('Failed to fetch schedules from database:', error);
@@ -36,9 +57,10 @@ const busSchedule = () => {
       loadSchedulesFromStorage();
     }
   };
+
   const loadSchedulesFromStorage = async () => {
     try {
-      const storedSchedules = await AsyncStorage.getItem(`Schedules_${selectedCity}`);
+     // const storedSchedules = await AsyncStorage.getItem(`Schedules_${selectedCity}`);
       console.log("Loaded data from local storage:", storedSchedules);
       if (storedSchedules) {
         setSchedules(JSON.parse(storedSchedules));
@@ -51,14 +73,17 @@ const busSchedule = () => {
       Alert.alert('Error', 'Failed to load schedules from local storage.');
     }
   };
+
   useEffect(() => {
     if (selectedCity) {
       console.log("City selected:", selectedCity);
       loadSchedules();
     }
-  }, [selectedCity]);
+  }, [selectedCity, token]);
+
   const navigateToBusSituation = (scheduleId) => {
-    navigation.navigate('BusDetails', {  scheduleId });};
+    navigation.navigate('BusDetails', {  scheduleId });
+  };
   
   return (
     <View style={styles.container}>
@@ -114,7 +139,6 @@ const busSchedule = () => {
               </Text>
               <TouchableOpacity
                 style={styles.linkButton}
-                //onPress={() =>navigation.navigate('BusDetails')}
                 onPress={() => navigateToBusSituation(schedule.nameOfBusStation,schedule.numberOfBuses)}
               >
                 <Text style={styles.linkText}>View Bus</Text>
@@ -146,6 +170,7 @@ const busSchedule = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -308,4 +333,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
 export default busSchedule;
