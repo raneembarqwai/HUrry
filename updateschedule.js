@@ -14,8 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const API_URL = {
-  Zarqa: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/zarqa/add',
-  Amman:  'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/amman/add',
+  Zarqa: 'https://f009-46-185-169-158.ngrok-free.app/zarqa/add',
+  Amman:  'https://f009-46-185-169-158.ngrok-free.app/amman/add',
 }
 
 const updateschedule = () => {
@@ -84,7 +84,7 @@ const fetchSchedulesFromAPI = async () => {
       }));
     const updatedSchedules = data.map(schedule => ({
       ...schedule,
-      operatorId: operatorId,  // إضافة الـ operatorId المحفوظ لكل المحطات
+      operatorId: operatorId,  
     }));
     setSchedules(updatedSchedules);
   }
@@ -203,10 +203,10 @@ return (
     <View style={styles.topBar}>
       <Text style={styles.appName}>HUrry</Text>
       <View style={styles.iconContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+        <TouchableOpacity onPress={() => navigation.navigate("notification",{role:'OPERATOR'})}>
           <Icon name="bell-outline" size={25} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
+        <TouchableOpacity onPress={() => navigation.navigate("profileop",{role:'OPERATOR'})} style={{ marginLeft: 15 }}>
           <Icon name="account-circle-outline" size={25} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -310,7 +310,7 @@ return (
                 style={styles.editButton}
                 onPress={() => navigateToUpdateBusPage(schedule.id)}
               >
-                <Text style={styles.buttonText}>Update Bus</Text>
+                <Text style={styles.buttonText}>Update Buses</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.removeButton}
@@ -326,7 +326,7 @@ return (
 
     {/* Bottom Navigation */}
     <View style={styles.bottomNav}>
-      <TouchableOpacity onPress={() => navigation.navigate("Home",{role:'OPERATOR'})} style={styles.navItem}>
+      <TouchableOpacity onPress={() => navigation.navigate("opertor",{role:'OPERATOR'})} style={styles.navItem}>
         <Icon name="home-outline" size={25} color="#59B3F8" />
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
@@ -334,11 +334,11 @@ return (
         <Icon name="calendar-clock" size={25} color="#59B3F8" />
         <Text style={styles.navText}>Schedule</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+      <TouchableOpacity onPress={() => navigation.navigate("feedback",{role:'OPERATOR'})} style={styles.navItem}>
         <Icon name="comment-outline" size={25} color="#59B3F8" />
         <Text style={styles.navText}>Feedback</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+      <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role:'OPERATOR'})} style={styles.navItem}>
         <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
         <Text style={styles.navText}>Missing</Text>
       </TouchableOpacity>
@@ -478,8 +478,8 @@ const styles = StyleSheet.create({
     //marginHorizontal: -20,
     //marginTop: 'auto', 
    //marginVertical: 0, 
-    position: 'absolute', // جعله ثابتًا
-  bottom: 0, // وضعه في الأسفل
+    position: 'absolute', 
+  bottom: 0, 
   left: 0,
   right: 0,
   },

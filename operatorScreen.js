@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-nati
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const operatorScreen = ({ navigation, route }) => {
-  const { role } = route.params; // Role passed from the sign-in page
+  const { role } = route.params; 
   const studentMenuItems = [
     {
       title: "Closest Bus Station",
@@ -31,22 +31,13 @@ const operatorScreen = ({ navigation, route }) => {
       action: () => navigation.navigate("notification", { role}),
     },
     {
-      title: "Profile",
-      icon: "account-circle-outline",
-      action: () => navigation.navigate("profileop", { role }),
+      title: "Evaluation",
+      icon: "file-document-edit",
+      action: () => navigation.navigate("evaluation", { role }),
     },
+  
   ];
   const driverMenuItems = [
-    {
-      title: "Closest Bus Station",
-      icon: "map-marker-radius",
-      action: () => navigation.navigate("ClosestBusStation"),
-    },
-    {
-      title: "Give Feedback",
-      icon: "comment-outline",
-      action: () => navigation.navigate("feedback"),
-    },
     {
       title: "Report Missing Items",
       icon: "alert-circle-outline",
@@ -82,7 +73,7 @@ const operatorScreen = ({ navigation, route }) => {
     {
       title: "View feedback",
       icon: "message-alert-outline",
-      action: () => navigation.navigate("feedback", { role }),
+      action: () => navigation.navigate("feedback" , { role }),
     },
     {
       title: "Evaluate Drivers",
@@ -90,14 +81,14 @@ const operatorScreen = ({ navigation, route }) => {
       action: () => navigation.navigate("EvaluateDrivers"),
     },
     {
-      title: "Notify Students",
+      title: "Notify Users",
       icon: "bell-ring-outline",
       action: () => navigation.navigate("notification" , { role }),
     },
     {
-      title: "Profile",
-      icon: "account-circle-outline",
-      action: () => navigation.navigate("profileop", { role }),
+      title: "Evaluation",
+      icon: "file-document-edit",
+      action: () => navigation.navigate("evaluation", { role }),
     },
   ];
   
@@ -150,7 +141,7 @@ const formatRole=(role)=>{
 
      {/* Bottom Navigation */}
      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home",{role})} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("operator",{role})} style={styles.navItem}>
           <Icon name="home-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
@@ -158,11 +149,11 @@ const formatRole=(role)=>{
           <Icon name="calendar-clock" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("feedback",{role})} style={styles.navItem}>
           <Icon name="comment-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Feedback</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role})} style={styles.navItem}>
           <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Missing</Text>
         </TouchableOpacity>
@@ -271,8 +262,8 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
     //marginHorizontal: -20,
     //marginVertical:75,
-    position: 'absolute', // جعله ثابتًا
-  bottom: 0, // وضعه في الأسفل
+    position: 'absolute',
+  bottom: 0,
   left: 0,
   right: 0,
   },

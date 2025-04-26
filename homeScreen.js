@@ -27,9 +27,7 @@ const homeScreen = () => {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('operator', { role: 'OPERATOR' })}>
         <Text style={styles.buttonText}>Operator</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('signup', { role: 'ADMIN' })}>
-        <Text style={styles.buttonText}>Admin</Text>
-      </TouchableOpacity>
+      
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.linkText}>Already have an account? Sign In</Text>

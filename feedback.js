@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   TextInput, 
-  Button, 
   FlatList, 
   StyleSheet,
   TouchableOpacity, 
@@ -27,10 +26,10 @@ const feedback = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState('');
 
-  // روابط API
+  
   const API_URLS = {
-    STUDENT: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/comments/submit',
-    OPERATOR: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/comments/page'
+    STUDENT: 'https://f009-46-185-169-158.ngrok-free.app/comments/submit',
+    OPERATOR: 'https://f009-46-185-169-158.ngrok-free.app/comments/page'
   };
 
   useEffect(() => {
@@ -66,9 +65,9 @@ const feedback = ({ route, navigation }) => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          content: formData.content,          // الحقل المطلوب
-          busStationName: formData.busStationName, // الحقل المطلوب
-          busNumber: formData.busNumber || '0'    // الحقل المطلوب
+          content: formData.content,
+          busStationName: formData.busStationName,
+          busNumber: formData.busNumber || '0'
         }),
       });
 
@@ -117,12 +116,11 @@ const feedback = ({ route, navigation }) => {
         throw new Error(data.message || 'Failed to fetch feedbacks');
       }
 
-      // تحويل البيانات لتطابق الأسماء المطلوبة
       const formattedFeedbacks = Array.isArray(data) ? data.map(item => ({
-        content: item.message || '',
+        content: item.content || '',
         studentName: item.studentName || 'Unknown',
-        student_Email: item.student_Email || 'N/A',
-        busStationName: item.station || '',
+        studentEmail: item.studentEmail || 'N/A',
+        busStationName: item.busStationName || '',
         busNumber: item.bus || '0',
         sendAt: item.date || new Date().toISOString()
       })) : [];
@@ -136,137 +134,157 @@ const feedback = ({ route, navigation }) => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.studentInfo}>
-        {item.studentName} ({item.student_Email})
-      </Text>
-      <Text style={styles.stationInfo}>
-        Station: {item.busStationName} | Bus: {item.busNumber}
-      </Text>
-      <Text style={styles.content}>{item.content}</Text>
-      <Text style={styles.date}>
+  const renderItem = ({ item, index }) => (
+    <View style={styles.feedbackItem}>
+      <View style={styles.feedbackHeader}>
+        <Icon name="account-circle" size={20} color="#59B3F8" />
+        <Text style={styles.feedbackNumber}>{index + 1}</Text>
+        <Text style={styles.feedbackTitle}>FEEDBACK</Text>
+      </View>
+      <Text style={styles.feedbackContent}>{item.content}</Text>
+      <View style={styles.feedbackDetails}>
+        <Text style={styles.detailText}>
+          <Icon name="account" size={14} color="#666" /> {item.studentName}
+        </Text>
+        <Text style={styles.detailText}>
+          <Icon name="email" size={14} color="#666" /> {item.studentEmail}
+        </Text>
+        <Text style={styles.detailText}>
+          <Icon name="bus-stop" size={14} color="#666" /> {item.busStationName}
+        </Text>
+        <Text style={styles.detailText}>
+          <Icon name="bus" size={14} color="#666" /> Bus: {item.busNumber}
+        </Text>
+      </View>
+      <Text style={styles.feedbackDate}>
+        <Icon name="clock-outline" size={14} color="#999" /> 
         {item.sendAt ? new Date(item.sendAt).toLocaleString() : 'Unknown date'}
       </Text>
     </View>
   );
 
   return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <View style={styles.container}>
-       {/* Top Bar */}
-                 <View style={styles.topBar}>
-                         <Text style={styles.appName}>HUrry</Text>
-                         <View style={styles.iconContainer}>
-                           <TouchableOpacity onPress={() => navigation.navigate("notification", { role })}>
-                             <Icon name="bell-outline" size={25} color="#fff" />
-                           </TouchableOpacity>
-                           <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
-                             <Icon name="account-circle-outline" size={25} color="#fff" />
-                           </TouchableOpacity>
-                         </View>
-                       </View>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>
-          {role === 'STUDENT' ? 'Submit Feedback' : 'Feedback List'}
-        </Text>
-      </View>
-
-      {loading && (
-        <View style={styles.loader}>
-         <ActivityIndicator size="large" color="#59B3F8" />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {/* Top Bar */}
+        <View style={styles.topBar}>
+          <Text style={styles.appName}>HUrry</Text>
+          <View style={styles.iconContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate("notification", { role })}>
+              <Icon name="bell-outline" size={25} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
+              <Icon name="account-circle-outline" size={25} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
 
-      {role === 'STUDENT' ? (
-        <ScrollView style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Bus Station Name*"
-            value={formData.busStationName}
-            onChangeText={(text) => setFormData({...formData, busStationName: text})}
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>
+            {role === 'STUDENT' ? 'Submit Feedback' : 'Feedback List'}
+          </Text>
+        </View>
+
+        {loading && (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" color="#59B3F8" />
+          </View>
+        )}
+
+        {role === 'STUDENT' ? (
+          <ScrollView style={styles.form}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Bus Station Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter station name..."
+                value={formData.busStationName}
+                onChangeText={(text) => setFormData({...formData, busStationName: text})}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Bus Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Optional"
+                value={formData.busNumber}
+                onChangeText={(text) => setFormData({...formData, busNumber: text})}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Your Feedback</Text>
+              <TextInput
+                style={[styles.input, styles.multiline]}
+                placeholder="Write your feedback here..."
+                value={formData.content}
+                onChangeText={(text) => setFormData({...formData, content: text})}
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>Submit Feedback</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        ) : (
+          <FlatList
+            data={feedbacks}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>
+                {loading ? 'Loading...' : 'No feedbacks found'}
+              </Text>
+            }
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Bus Number (optional)"
-            value={formData.busNumber}
-            onChangeText={(text) => setFormData({...formData, busNumber: text})}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={[styles.input, styles.multiline]}
-            placeholder="Your Feedback*"
-            value={formData.content}
-            onChangeText={(text) => setFormData({...formData, content: text})}
-            multiline
-            numberOfLines={4}
-          />
-          <Button
-            title="Submit"
-            onPress={handleSubmit}
-            disabled={loading}
-          />
-        </ScrollView>
-      ) : (
-        <FlatList
-          data={feedbacks}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              {loading ? 'Loading...' : 'No feedbacks found'}
-            </Text>
-          }
-        />
-      )}
-       {/* Bottom Navigation */}
-                  <View style={styles.bottomNav}>
-                          <TouchableOpacity onPress={() => navigation.navigate("Home", { role })} style={styles.navItem}>
-                            <Icon name="home-outline" size={25} color="#59B3F8" />
-                            <Text style={styles.navText}>Home</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => navigation.navigate(role === "OPERATOR" ? 'updateschedule' : 'busSchedule')} style={styles.navItem}>
-                            <Icon name="calendar-clock" size={25} color="#59B3F8" />
-                            <Text style={styles.navText}>Schedule</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
-                            <Icon name="comment-outline" size={25} color="#59B3F8" />
-                            <Text style={styles.navText}>Feedback</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
-                            <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
-                            <Text style={styles.navText}>Missing</Text>
-                          </TouchableOpacity>
-                        </View>
-                      
-    </View>
+        )}
+
+        {/* Bottom Navigation */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity onPress={() => navigation.navigate("operator", { role })} style={styles.navItem}>
+            <Icon name="home-outline" size={25} color="#59B3F8" />
+            <Text style={styles.navText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate(role === "OPERATOR" ? 'updateschedule' : 'busSchedule')} style={styles.navItem}>
+            <Icon name="calendar-clock" size={25} color="#59B3F8" />
+            <Text style={styles.navText}>Schedule</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("feedback",{role})} style={styles.navItem}>
+            <Icon name="comment-outline" size={25} color="#59B3F8" />
+            <Text style={styles.navText}>Feedback</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role})} style={styles.navItem}>
+            <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
+            <Text style={styles.navText}>Missing</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: "#f8ffff",
-    paddingHorizontal: 20,
-    paddingTop: 0,
+    paddingBottom: 60,
   },
   header: {
-    fontSize: 28,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#2C3E50',
-    marginTop: 20,
+    padding: 20,
+    paddingBottom: 10,
   },
   headerText: {
     fontSize: 28,
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 10,
     color: '#2C3E50',
-    marginTop: 10,
   },
   loader: {
     position: 'absolute',
@@ -280,66 +298,94 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   form: {
-    padding: 15,
+    padding: 20,
     backgroundColor: '#ffffff',
     borderRadius: 10,
-    marginVertical: 10,
+    margin: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 5,
-    
+    elevation: 3,
+    borderWidth: 1, 
+    borderColor: '#ddd',
   },
   input: {
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
     borderColor: '#ddd',
     padding: 15,
-    marginBottom: 15,
     borderRadius: 8,
     backgroundColor: '#FCFCFC',
     fontSize: 16,
-    fontSize: 16,
-    fontWeight: "600",
     color: "#333",
     marginTop: 10,
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    
   },
   multiline: {
     minHeight: 100,
     textAlignVertical: 'top',
   },
-  item: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  studentInfo: {
+  feedbackItem: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#59B3F8',
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  feedbackNumber: {
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#59B3F8',
+    marginLeft: 8,
+    marginRight: 10,
+  },
+  feedbackTitle: {
+    color: '#59B3F8',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  feedbackContent: {
     fontSize: 16,
+    marginVertical: 10,
+    color: '#333',
+    lineHeight: 22,
+  },
+  feedbackDetails: {
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 10,
+  },
+  detailText: {
+    fontSize: 14,
+    color: '#666',
     marginBottom: 5,
   },
-  stationInfo: {
-    color: '#555',
-    marginBottom: 8,
-  },
-  content: {
-    fontSize: 14,
-    marginVertical: 10,
-  },
-  date: {
-    color: '#666',
+  feedbackDate: {
     fontSize: 12,
+    color: '#999',
+    marginTop: 10,
     textAlign: 'right',
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
     color: '#666',
+    fontSize: 16,
   },
   topBar: {
     flexDirection: "row",
@@ -347,8 +393,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#59B3F8",
     paddingVertical: 10,
-    paddingHorizontal:20,
-    marginHorizontal: -20,
+    paddingHorizontal: 20,
   },
   appName: {
     fontSize: 20,
@@ -366,10 +411,8 @@ const styles = StyleSheet.create({
     height: 60,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
-    //marginHorizontal: -20,
-    //marginVertical:75,
-    position: 'absolute', // جعله ثابتًا
-    bottom: 0, // وضعه في الأسفل
+    position: 'absolute',
+    bottom: 0,
     left: 0,
     right: 0,
   },
@@ -383,8 +426,49 @@ const styles = StyleSheet.create({
     color: '#59B3F8',
     marginTop: 5,
   },
-  role:{
-    color: "#59B3F8"
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2C3E50',
+    marginBottom: 8,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    borderRadius: 8,
+    backgroundColor: '#59B3F8',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#4a9bd6',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonContaine: {
+    marginTop: 20,
+    borderRadius: 8,
+    backgroundColor: '#59B3F8',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#4a9bd6',
   },
 });
 

@@ -5,30 +5,31 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BusDetails = ({ route, navigation }) => {
+  const { role } = route.params;
   const [busDetails, setBusDetails] = useState([]);
 
   useEffect(() => {
     const fetchBusDetails = async () => {
       try {
-        // الرابط الثابت للـ API
-        const apiUrl = 'https://8516-2a01-9700-8003-b900-1106-e24a-d33e-b4fe.ngrok-free.app/buses/all'; // ضع رابط الـ API هنا
+        
+        const apiUrl = 'https://f009-46-185-169-158.ngrok-free.app/buses/all'; 
 
-        // جلب البيانات من الـ API
+        
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        console.log('Bus details fetched from API:', data); // التحقق من البيانات
+        console.log('Bus details fetched from API:', data); 
         setBusDetails(data);
 
-        // حفظ البيانات في AsyncStorage (اختياري)
-        await AsyncStorage.setItem('busData', JSON.stringify(data));
+        
+        //await AsyncStorage.setItem('busData', JSON.stringify(data));
       } catch (error) {
         console.log('Error fetching bus details:', error);
-        // إذا فشل جلب البيانات من الـ API، حاول تحميل البيانات المحفوظة في AsyncStorage
-        const storedData = await AsyncStorage.getItem('busData');
+        
+       // const storedData = await AsyncStorage.getItem('busData');
         if (storedData) {
           setBusDetails(JSON.parse(storedData));
         }
@@ -44,10 +45,10 @@ const BusDetails = ({ route, navigation }) => {
       <View style={styles.topBar}>
         <Text style={styles.appName}>HUrry</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+          <TouchableOpacity onPress={() => navigation.navigate("notification",{role:'STUDENT'})}>
             <Icon name="bell-outline" size={25} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("profileop",{role:'STUDENT'})} style={{ marginLeft: 15 }}>
             <Icon name="account-circle-outline" size={25} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -56,34 +57,65 @@ const BusDetails = ({ route, navigation }) => {
       <Text style={styles.header}>Bus Details</Text>
 
       {/* Bus Details Table */}
-      <ScrollView>
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.tableCell, styles.tableHeaderText]}>Bus Number</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText]}>Driver</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText]}>Arrival time</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText]}>Departure time</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText]}>Driver email</Text>
-          </View>
-          {busDetails.length > 0 ? (
-            busDetails.map((bus, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell}>{bus.number_of_bus}</Text>
-                <Text style={styles.tableCell}>{bus.Driver_name}</Text>
-                <Text style={styles.tableCell}>{bus.Arrival_Time}</Text>
-                <Text style={styles.tableCell}>{bus.Departure_Time}</Text>
-                <Text style={styles.tableCell}>{bus.Driver_Email}</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noDataText}>No bus details available.</Text>
-          )}
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+  <View style={styles.tableContainer}>
+    <View style={styles.table}>
+      {/* Header Row */}
+      <View style={styles.tableHeader}>
+        <View style={styles.iconHeaderCell}>
+          <Icon name="bus" size={18} color="#2C3E50" />
+          <Text style={[styles.tableHeaderText, styles.busNumberCell]}>Bus </Text>
         </View>
-      </ScrollView>
+        <View style={styles.iconHeaderCell}>
+          <Icon name="account" size={18} color="#2C3E50" />
+          <Text style={[styles.tableHeaderText, styles.driverCell]}>Driver</Text>
+        </View>
+        <View style={styles.iconHeaderCell}>
+          <Icon name="clock-time-four-outline" size={18} color="#2C3E50" />
+          <Text style={[styles.tableHeaderText, styles.timeCell]}>Arrival time</Text>
+        </View>
+        <View style={styles.iconHeaderCell}>
+          <Icon name="clock-time-three-outline" size={18} color="#2C3E50" />
+          <Text style={[styles.tableHeaderText, styles.timeCell]}>Departure </Text>
+        </View>
+        <View style={styles.iconHeaderCell}>
+          <Icon name="email-outline" size={18} color="#2C3E50" />
+          <Text style={[styles.tableHeaderText, styles.emailCell]}>Email</Text>
+        </View>
+      </View>
+      
+      {/* Data Rows */}
+      {busDetails.length > 0 ? (
+        busDetails.map((bus, index) => (
+          <View key={index} style={styles.tableRow}>
+            <View style={styles.iconDataCell}>
+              <Text style={[styles.tableCell, styles.busNumberCell]}>{bus.numberOfBuses}</Text>
+            </View>
+            <View style={styles.iconDataCell}>
+              <Text style={[styles.tableCell, styles.driverCell]}>{bus.driverName}</Text>
+            </View>
+            <View style={styles.iconDataCell}>
+              <Text style={[styles.tableCell, styles.timeCell]}>{bus.arrivalTime}</Text>
+            </View>
+            <View style={styles.iconDataCell}>
+              <Text style={[styles.tableCell, styles.timeCell]}>{bus.departureTime}</Text>
+            </View>
+            <View style={styles.iconDataCell}>
+              <Text style={[styles.tableCell, styles.emailCell]}>{bus.driverEmail}</Text>
+            </View>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.noDataText}>No bus details available.</Text>
+      )}
+    </View>
+  </View>
+</ScrollView>
+      
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("operator",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="home-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
@@ -91,11 +123,11 @@ const BusDetails = ({ route, navigation }) => {
           <Icon name="calendar-clock" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("feedback",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="comment-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Feedback</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Missing</Text>
         </TouchableOpacity>
@@ -107,63 +139,80 @@ const BusDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 8,
     backgroundColor: '#f8ffff',
     paddingTop: 0,
   },
   header: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 20,
     color: '#2C3E50',
+    marginTop: 20,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   table: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    marginBottom: 25,
-    padding: 15,
+    marginBottom: 20,
+    padding: 10,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     borderWidth: 1.4,
-    borderColor: '#DDDDDD',
-    borderRadius: 5,
-    borderStyle: 'solid',
+    borderColor: '#e0e6ed',
+    borderRadius: 6,
+    //borderStyle: 'solid',
   },
   tableHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 2,
-    borderColor: '#DDDDDD',
-    paddingBottom: 8,
-    marginBottom: 12,
+    borderColor: '#59B3F8',
+    paddingBottom: 12,
+    marginBottom: 8,
+    backgroundColor: '#f5f9ff',
+    borderRadius: 8,
+    //paddingHorizontal: 5,
+    minWidth: 400,
   },
   tableHeaderText: {
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#2C3E50',
+    fontSize: 15,
+    textAlign: 'center',
   },
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#f0f0f0',
+    alignItems: 'center',
+    //paddingHorizontal: 5,
+    minWidth: 400,
+    
   },
   tableCell: {
-    flex: 1,
+   // width: 100,
+    //flex: 1,
     textAlign: 'center',
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '400',
+    fontSize: 14,
+    color: '#444',
+    fontWeight: '500',
+    paddingHorizontal: 8, // خلاه ينزل سطر بدل 3
   },
   noDataText: {
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 16,
     color: '#888',
     marginTop: 20,
+    paddingVertical: 20,
+    fontStyle: 'italic',
   },
   topBar: {
     flexDirection: "row",
@@ -203,6 +252,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#59B3F8',
     marginTop: 5,
+  },
+  tableContainer: {
+    flexDirection: 'column',
+    minWidth: 400, 
+  },
+  busNumberCell: {
+    width: 26, 
+  },
+  driverCell: {
+    width: 100, 
+  },
+  timeCell: {
+    width: 80,
+  },
+  emailCell: {
+    width: 140,
+  },
+  iconHeaderCell: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    color:"#59B3F8",
+  },
+  iconDataCell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    color:"#59B3F8",
+  },
+  tableHeaderText: {
+    fontWeight: '700',
+    color: '#2C3E50',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 4,
+    
   },
 });
 

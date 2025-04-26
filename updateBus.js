@@ -16,11 +16,11 @@ const updateBus = ({ route, navigation }) => {
 
   const [busData, setBusData] = useState(
     Array.from({ length: numberOfBuses }, (_, i) => ({
-      number_of_bus: i + 1,
-      Driver_name: '',
-      Arrival_Time: '',
-      Departure_Time: '',
-      Driver_Email: '',
+      numberOfBuses: i + 1,
+      driverName: '',
+      arrivalTime: '',
+      departureTime: '',
+      driverEmail: '',
     }))
   );
 
@@ -32,7 +32,7 @@ const updateBus = ({ route, navigation }) => {
       try {
         //const storedData = await AsyncStorage.getItem('busData');
         if (storedData) {
-          setSavedData(JSON.parse(storedData));
+         setSavedData(JSON.parse(storedData));
         }
       } catch (error) {
         console.log('Error loading saved data:', error);
@@ -62,7 +62,7 @@ const updateBus = ({ route, navigation }) => {
 
   const saveUpdates = async () => {
     const isAnyFieldEmpty = busData.some(bus => 
-      !bus.Driver_name || !bus.Arrival_Time || !bus.Departure_Time || !bus.Driver_Email
+      !bus.driverName || !bus.arrivalTime || !bus.departureTime || !bus.driverEmail
     );
 
     if (isAnyFieldEmpty) {
@@ -71,7 +71,7 @@ const updateBus = ({ route, navigation }) => {
     }
 
     try {
-      const response = await fetch('https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/buses/add', {
+      const response = await fetch('https://f009-46-185-169-158.ngrok-free.app/buses/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ const updateBus = ({ route, navigation }) => {
         throw new Error('Network response was not ok');
       }
 
-      //await AsyncStorage.setItem('busData', JSON.stringify(busData));
+     //await AsyncStorage.setItem('busData', JSON.stringify(busData));
       setSavedData(busData);
       Alert.alert('Success', 'Bus data saved successfully!');
     } catch (error) {
@@ -99,10 +99,10 @@ const updateBus = ({ route, navigation }) => {
       <View style={styles.topBar}>
         <Text style={styles.appName}>HUrry</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+          <TouchableOpacity onPress={() => navigation.navigate("notification",{role:'OPERATOR'})}>
             <Icon name="bell-outline" size={25} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile",{role:'OPERATOR'})} style={{ marginLeft: 15 }}>
             <Icon name="account-circle-outline" size={25} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -112,38 +112,40 @@ const updateBus = ({ route, navigation }) => {
 
       <ScrollView>
         <View style={styles.table}>
-          <View style={styles.tableHeader}>
+          <View style={styles.tableHeader}numberOfLines={1} 
+      ellipsizeMode="tail">
             <Text style={styles.tableCell}>Bus Number</Text>
-            <Text style={styles.tableCell}>Driver</Text>
+            <Text style={styles.tableCell}>Driver name</Text>
             <Text style={styles.tableCell}>Arrival time</Text>
-            <Text style={styles.tableCell}>Departure time</Text>
+            <Text style={styles.tableCell}>Departure time </Text>
             <Text style={styles.tableCell}>Driver email</Text>
           </View>
           {busData.map((bus, index) => (
             <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{bus.number_of_bus}</Text>
+     
+      <Text style={styles.tableCell}>{bus.numberOfBuses}</Text>
               <TextInput
                 style={styles.input}
-                value={bus.Driver_name}
-                onChangeText={(text) => updateBusStatus(index, 'Driver_name', text)}
+                value={bus.driverName}
+                onChangeText={(text) => updateBusStatus(index, 'driverName', text)}
                 placeholder="Driver Name"
               />
               <TextInput
                 style={styles.input}
-                value={bus.Arrival_Time}
-                onChangeText={(text) => updateBusStatus(index, 'Arrival_Time', text)}
+                value={bus.arrivalTime}
+                onChangeText={(text) => updateBusStatus(index, 'arrivalTime', text)}
                 placeholder="Arrival Time"
               />
               <TextInput
                 style={styles.input}
-                value={bus.Departure_Time}
-                onChangeText={(text) => updateBusStatus(index, 'Departure_Time', text)}
+                value={bus.departureTime}
+                onChangeText={(text) => updateBusStatus(index, 'departureTime', text)}
                 placeholder="Departure Time"
               />
               <TextInput
                 style={styles.input}
-                value={bus.Driver_Email}
-                onChangeText={(text) => updateBusStatus(index, 'Driver_Email', text)}
+                value={bus.driverEmail}
+                onChangeText={(text) => updateBusStatus(index, 'driverEmail', text)}
                 placeholder="Driver Email"
               />
             </View>
@@ -153,22 +155,23 @@ const updateBus = ({ route, navigation }) => {
         {/* saving schedule*/}
         {savedData.length > 0 && (
           <View style={styles.table}>
-            <Text style={styles.savedHeader}>Saved Bus Information</Text>
+            <Text style={styles.savedHeader }numberOfLines={1} 
+      ellipsizeMode="tail">Saved Bus Information</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={styles.tableCell}>Bus Number</Text>
-                <Text style={styles.tableCell}>Driver</Text>
+                <Text style={styles.tableCell}>Driver name</Text>
                 <Text style={styles.tableCell}>Arrival time</Text>
-                <Text style={styles.tableCell}>Departure time</Text>
+                <Text style={styles.tableCell}>Departur time</Text>
                 <Text style={styles.tableCell}>Driver email</Text>
               </View>
               {savedData.map((bus, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{bus.number_of_bus}</Text>
-                  <Text style={styles.tableCell}>{bus.Driver_name}</Text>
-                  <Text style={styles.tableCell}>{bus.Arrival_Time}</Text>
-                  <Text style={styles.tableCell}>{bus.Departure_Time}</Text>
-                  <Text style={styles.tableCell}>{bus.Driver_Email}</Text>
+                  <Text style={styles.tableCell}>{bus.numberOfBuses}</Text>
+                  <Text style={styles.tableCell}>{bus.driverName}</Text>
+                  <Text style={styles.tableCell}>{bus.arrivalTime}</Text>
+                  <Text style={styles.tableCell}>{bus.departureTime}</Text>
+                  <Text style={styles.tableCell}>{bus.driverEmail}</Text>
                 </View>
               ))}
             </View>
@@ -182,7 +185,7 @@ const updateBus = ({ route, navigation }) => {
 
       {/* bottom*/}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("opertor",{role:'OPERATOR'})} style={styles.navItem}>
           <Icon name="home-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
@@ -190,11 +193,11 @@ const updateBus = ({ route, navigation }) => {
           <Icon name="calendar-clock" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("feedback",{role:'OPERATOR'})} style={styles.navItem}>
           <Icon name="comment-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Feedback</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role:'OPERATOR'})} style={styles.navItem}>
           <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Missing</Text>
         </TouchableOpacity>
@@ -206,7 +209,7 @@ const updateBus = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 8,
     backgroundColor: '#f8ffff',
     paddingTop: 0,
   },
@@ -234,33 +237,46 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
   },
   tableHeader: {
+    
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: '#DDDDDD',
     paddingBottom: 10,
     marginBottom: 15,
+  
+    //ellipsizeMode:"tail" ,
   },
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 8,
+    alignItems: 'center',
+    
   },
   tableCell: {
     flex: 1,
     textAlign: 'center',
     fontWeight: '600',
     color: '#34495E',
+    marginBottom: 5,
+    fontSize: 14,
+    minWidth: 15,
+    
+    
   },
   input: {
     flex: 1,
-    padding: 10,
+    padding:10,
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 8,
     backgroundColor: '#F9F9F9',
-    fontSize: 14,
     color: '#34495E',
+    fontSize: 12, 
+    marginHorizontal: 2, 
+    height: 40, 
+    minWidth: 15,
   },
   savedHeader: {
     fontSize: 18,

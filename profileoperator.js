@@ -20,23 +20,23 @@ const profileoperator = ({ route, navigation }) => {
     email: '',
     studentId: '',
     licenseNumber: '',
-    company_name: '',
+    companyName: '',
     profilePicture: null,
   });
 
-  // روابط API لكل نوع مستخدم
+ 
   const API_URLS = {
     STUDENT: {
-      GET: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/student/profile',
-      PUT: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/student/profile'
+      GET: 'https://f009-46-185-169-158.ngrok-free.app/student/profile',
+      PUT: 'https://f009-46-185-169-158.ngrok-free.app/student/profile'
     },
     DRIVER: {
-      GET: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/driver/profile',
-      PUT: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/driver/profile'
+      GET: 'https://f009-46-185-169-158.ngrok-free.app/driver/profile',
+      PUT: 'https://f009-46-185-169-158.ngrok-free.app/driver/profile'
     },
     OPERATOR: {
-      GET: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/operator/profile',
-      PUT: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/operator/profile'
+      GET: 'https://f009-46-185-169-158.ngrok-free.app/operator/profile',
+      PUT: 'https://f009-46-185-169-158.ngrok-free.app/operator/profile'
     }
   };
 
@@ -48,7 +48,7 @@ const profileoperator = ({ route, navigation }) => {
         return;
       }
 
-      // تحديد الرابط بناءً على نوع المستخدم
+      
       const apiUrl = API_URLS[role].GET;
 
       const response = await fetch(apiUrl, {
@@ -64,7 +64,7 @@ const profileoperator = ({ route, navigation }) => {
 
       const data = await response.json();
       
-      // تحديث البيانات بناءً على نوع المستخدم
+      
       const updatedData = {
         name: data.name || '',
         email: data.email || '',
@@ -76,7 +76,7 @@ const profileoperator = ({ route, navigation }) => {
       } else if (role === 'DRIVER') {
         updatedData.licenseNumber = data.licenseNumber || '';
       } else if (role === 'OPERATOR') {
-        updatedData.company_name = data.company_name || '';
+        updatedData.companyName = data.companyName || '';
       }
       
       setUserData(updatedData);
@@ -117,23 +117,23 @@ const profileoperator = ({ route, navigation }) => {
         return;
       }
 
-      // تحديد الرابط بناءً على نوع المستخدم
+      
       const apiUrl = API_URLS[role].PUT;
 
-      // تحضير البيانات للإرسال
+      
       const requestData = {
         name: userData.name,
         email: userData.email,
         profilePicture: userData.profilePicture,
       };
 
-      // إضافة الحقول الخاصة بكل نوع مستخدم
+      
       if (role === 'STUDENT') {
         requestData.studentId = userData.studentId;
       } else if (role === 'DRIVER') {
         requestData.licenseNumber = userData.licenseNumber;
       } else if (role === 'OPERATOR') {
-        requestData.company_name = userData.company_name;
+        requestData.companyName = userData.companyName;
       }
 
       const response = await fetch(apiUrl, {
@@ -156,99 +156,113 @@ const profileoperator = ({ route, navigation }) => {
     }
   };
 
-  // عرض المحتوى بناءً على الدور
+  
   const renderContentBasedOnRole = () => {
     switch (role) {
       case 'STUDENT':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}></Text>
-            <Text style={styles.roleSpecificText}>Student Name:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.name}
-              onChangeText={(text) => setUserData({ ...userData, name: text })}
-              placeholder="Enter Student Name"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="account" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.name}
+                onChangeText={(text) => setUserData({ ...userData, name: text })}
+                placeholder="Student Name"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Student Email:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.email}
-              onChangeText={(text) => setUserData({ ...userData, email: text })}
-              placeholder="Enter Student Email"
-              keyboardType="email-address"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="email" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.email}
+                onChangeText={(text) => setUserData({ ...userData, email: text })}
+                placeholder="Student Email"
+                keyboardType="email-address"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Student ID:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.studentId}
-              onChangeText={(text) => setUserData({ ...userData, studentId: text })}
-              placeholder="Enter Student ID"
-              keyboardType="numeric"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="card-account-details" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.studentId}
+                onChangeText={(text) => setUserData({ ...userData, studentId: text })}
+                placeholder="Student ID"
+                keyboardType="numeric"
+              />
+            </View>
           </View>
         );
       case 'DRIVER':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}> </Text>
-            <Text style={styles.roleSpecificText}>Driver Name:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.name}
-              onChangeText={(text) => setUserData({ ...userData, name: text })}
-              placeholder="Enter Driver Name"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="account" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.name}
+                onChangeText={(text) => setUserData({ ...userData, name: text })}
+                placeholder="Driver Name"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Driver Email:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.email}
-              onChangeText={(text) => setUserData({ ...userData, email: text })}
-              placeholder="Enter Driver Email"
-              keyboardType="email-address"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="email" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.email}
+                onChangeText={(text) => setUserData({ ...userData, email: text })}
+                placeholder="Driver Email"
+                keyboardType="email-address"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Driver ID:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.licenseNumber}
-              onChangeText={(text) => setUserData({ ...userData, licenseNumber: text })}
-              placeholder="Enter Driver ID"
-              keyboardType="numeric"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="license" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.licenseNumber}
+                onChangeText={(text) => setUserData({ ...userData, licenseNumber: text })}
+                placeholder="License Number"
+              />
+            </View>
           </View>
         );
       case 'OPERATOR':
         return (
           <View style={styles.roleSpecificContainer}>
-            <Text style={styles.roleSpecificHeader}></Text>
-            <Text style={styles.roleSpecificText}>Operator Name:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.name}
-              onChangeText={(text) => setUserData({ ...userData, name: text })}
-              placeholder="Enter Operator Name"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="account" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.name}
+                onChangeText={(text) => setUserData({ ...userData, name: text })}
+                placeholder="Operator Name"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Operator Email:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.email}
-              onChangeText={(text) => setUserData({ ...userData, email: text })}
-              placeholder="Enter Operator Email"
-              keyboardType="email-address"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="email" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.email}
+                onChangeText={(text) => setUserData({ ...userData, email: text })}
+                placeholder="Operator Email"
+                keyboardType="email-address"
+              />
+            </View>
 
-            <Text style={styles.roleSpecificText}>Company Name:</Text>
-            <TextInput
-              style={styles.input}
-              value={userData.company_name}
-              onChangeText={(text) => setUserData({ ...userData, company_name: text })}
-              placeholder="Enter Company Name"
-            />
+            <View style={styles.inputContainer}>
+              <Icon name="office-building" size={24} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                value={userData.companyName}
+                onChangeText={(text) => setUserData({ ...userData, companyName: text })}
+                placeholder="Company Name"
+              />
+            </View>
           </View>
         );
       default:
@@ -272,7 +286,8 @@ const profileoperator = ({ route, navigation }) => {
       </View>
 
       {/* Profile Picture */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.profileSection}>
         <View style={styles.profilePictureContainer}>
           {userData.profilePicture ? (
             <Image
@@ -290,23 +305,31 @@ const profileoperator = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Role-specific content */}
-        {renderContentBasedOnRole()}
+{/* User Info */}
+<View style={styles.userInfo}>
+          <Text style={styles.userName}>{userData.name || 'Name'}</Text>
+          <Text style={styles.userRole}>{role}</Text>
+        </View>
+      </View>
 
+        {/* Role-specific content */}
+        <View style={styles.formContainer}>
+        {renderContentBasedOnRole()}
+        </View>
+        
         {/* Save button */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={handleSaveChanges}
+          <TouchableOpacity 
+              style={styles.saveButton}
+              onPress={handleSaveChanges}
           >
+            <Icon name="content-save" size={24} color="#fff" />
             <Text style={styles.footerButtonText}>Save Changes</Text>
           </TouchableOpacity>
-        </View>
       </ScrollView>
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home", { role })} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("operator", { role })} style={styles.navItem}>
           <Icon name="home-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
@@ -314,11 +337,11 @@ const profileoperator = ({ route, navigation }) => {
           <Icon name="calendar-clock" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("feedback",{role})} style={styles.navItem}>
           <Icon name="comment-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Feedback</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role})} style={styles.navItem}>
           <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Missing</Text>
         </TouchableOpacity>
@@ -331,120 +354,175 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8ffff',
-    paddingHorizontal: 20,
     paddingTop: 0,
-    paddingBottom: 60, // ارتفاع الشريط السفلي
+    paddingBottom: 60,
   },
-  profilePictureContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  profilePicture: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#DDDDDD',
-  },
-  editPictureButton: {
-    marginTop: 10,
-    backgroundColor: '#59B3F8',
-    padding: 5,
-    borderRadius: 8,
-  },
-  editPictureText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  footer: {
-    marginTop: 20, // مسافة صغيرة فوق الزر
-    alignItems: 'center',
-    marginBottom: 20, // مسافة صغيرة تحت الزر
-  },
-  footerButton: {
-    backgroundColor: '#59B3F8',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+  scrollContainer: {
+    padding: 25,
+    paddingBottom: 20,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#59B3F8",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: -20,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
   },
   appName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
+    letterSpacing: 1,
   },
   iconContainer: {
     flexDirection: "row",
+    alignItems: 'center',
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 30,
+    backgroundColor: '#f8ffff', 
+    //backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 10,
+    //elevation: 2,
+    shadowColor: '#000',
+    //shadowOffset: { width: 0, height: 1 },
+    //shadowOpacity: 0.1,
+  },
+  profilePictureContainer: {
+    position: 'relative',
+    marginRight: 25,
+  },
+  profilePicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 3,
+    borderColor: '#59B3F8',
+  },
+  editPictureButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#59B3F8',
+    padding: 8,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editPictureText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    marginLeft: 5,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 5,
+  },
+  userRole: {
+    fontSize: 16,
+    color: '#7F8C8D',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    alignSelf: 'flex-start',
+  },
+  formContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 25,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+  },
+  inputContainer: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingBottom: 10,
+  },
+  inputIcon: {
+    marginRight: 15,
+    color: '#59B3F8',
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#34495E',
+    marginBottom: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#555',
+    paddingVertical: 8,
+  },
+  saveButton: {
+    backgroundColor: '#59B3F8',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginTop: 30,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignSelf:'center',
+  },
+  footerButtonText: {
+    color: '#ffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#fff',
-    height: 60,
+    height: 65,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
-    position: 'absolute', // جعله ثابتًا
-    bottom: 0, // وضعه في الأسفل
+    position: 'absolute',
+    bottom: 0,
     left: 0,
     right: 0,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
   },
   navItem: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 8,
   },
   navText: {
     fontSize: 12,
     color: '#59B3F8',
     marginTop: 5,
-  },
-  roleSpecificContainer: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#F1F8FF',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  roleSpecificHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#2C3E50',
-    textAlign: 'center',
-  },
-  roleSpecificText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#34495E',
-  },
-  input: {
-    fontSize: 16,
-    marginBottom: 15,
-    color: '#555555',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-    paddingVertical: 5,
+    fontWeight: '500',
   },
 });
-
 export default profileoperator;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator,Keyboard,TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator,Keyboard,TouchableWithoutFeedback,ScrollView } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const notification = ({ route, navigation }) => {
     const { role: userRole } = route.params;
+    //const { role: rolee } = route.params;
     const [message, setMessage] = useState('');
     const [userMessage, setUserMessage] = useState('');
     const [selectedRole, setSelectedRole] = useState('STUDENT');
@@ -15,10 +16,10 @@ const notification = ({ route, navigation }) => {
 
     const API_URLS = {
         OPERATOR: {
-            SEND: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/announcements/create',
+            SEND: 'https://f009-46-185-169-158.ngrok-free.app/announcements/create',
         },
         OTHERS: {
-            GET: 'https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/announcements/view'
+            GET: 'https://f009-46-185-169-158.ngrok-free.app/announcements/view'
         }
     };
 
@@ -143,9 +144,13 @@ const notification = ({ route, navigation }) => {
         }
     };
 
-    const renderNotificationItem = ({ item }) => {
+    const renderNotificationItem = ({ item, index }) => {
         return (
             <View style={styles.notificationItem}>
+                <View style={styles.notificationHeader}>
+                <Icon name="bell-alert-outline" size={20} color="#59B3F8" />
+                <Text style={styles.notificationNumber}> {index + 1}</Text>
+            </View>
                 <Text style={styles.notificationText}>{item.message}</Text>
                 <Text style={styles.notificationDetails}>
                     Sent at: {new Date(item.sentAt).toLocaleString()}
@@ -161,84 +166,116 @@ const notification = ({ route, navigation }) => {
            <View style={styles.topBar}>
                    <Text style={styles.appName}>HUrry</Text>
                    <View style={styles.iconContainer}>
-                     <TouchableOpacity onPress={() => navigation.navigate("notification", { role })}>
+                     <TouchableOpacity onPress={() => navigation.navigate("notification", { userRole })}>
                        <Icon name="bell-outline" size={25} color="#fff" />
                      </TouchableOpacity>
-                     <TouchableOpacity onPress={() => navigation.navigate("profileop", { role })} style={{ marginLeft: 15 }}>
+                     <TouchableOpacity onPress={() => navigation.navigate("profileop", { userRole })} style={{ marginLeft: 15 }}>
                        <Icon name="account-circle-outline" size={25} color="#fff" />
                      </TouchableOpacity>
                    </View>
                  </View>
+                 <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
 
-            <Text style={styles.title}>Notification, {userRole}</Text>
+            <Text style={styles.title}>Notifications {userRole}</Text>
 
             {loading && <ActivityIndicator size="large" color="#59B3F8" />}
 
             {userRole === 'OPERATOR' ? (
-                <View style={styles.dashboard}>
-                    <Text style={styles.subtitle}>Send to Role:</Text>
-                    <View style={styles.roleSelector}>
-                        <TouchableOpacity
-                            style={[styles.roleButton, selectedRole === 'STUDENT' && styles.selectedRoleButton]}
-                            onPress={() => setSelectedRole('STUDENT')}
-                        >
-                            <Text style={styles.roleButtonText}>Student</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.roleButton, selectedRole === 'DRIVER' && styles.selectedRoleButton]}
-                            onPress={() => setSelectedRole('DRIVER')}
-                        >
-                            <Text style={styles.roleButtonText}>Driver</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter message"
-                        value={message}
-                        onChangeText={setMessage}
-                        multiline
-                    />
-                    <Button title="Send Notification" onPress={sendNotificationToRole} color="#59B3F8" />
-
-                    <View style={styles.userSection}>
-                    <Text style={styles.subtitle}>Send to User:</Text>
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter User ID"
-                        value={userId}
-                        onChangeText={setUserId}
-                        keyboardType="numeric"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter message"
-                        value={userMessage}
-                        onChangeText={setUserMessage}
-                        multiline
-                    />
-                    <Button title="Send Notification" onPress={sendNotificationToUser} color="#59B3F8" />
-                </View>
-                </View>
-            ) : (
+               <View style={styles.dashboard}>
+               {/* Section 1: Send to All Users */}
+               <View style={styles.sectionContainer}>
+                   <Text style={styles.sectionTitle}>Send to All: </Text>
+                   
+                   <View style={styles.roleSelector}>
+                       <TouchableOpacity
+                           style={[styles.roleButton, selectedRole === 'STUDENT' && styles.selectedRoleButton]}
+                           onPress={() => setSelectedRole('STUDENT')}
+                       >
+                           <Text style={styles.roleButtonText}>Students</Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity
+                           style={[styles.roleButton, selectedRole === 'DRIVER' && styles.selectedRoleButton]}
+                           onPress={() => setSelectedRole('DRIVER')}
+                       >
+                           <Text style={styles.roleButtonText}>Drivers</Text>
+                       </TouchableOpacity>
+                   </View>
+                   
+                   <TextInput
+                       style={styles.input}
+                       placeholder="Type your message here..."
+                       value={message}
+                       onChangeText={setMessage}
+                       multiline
+                   />
+                   
+                   <TouchableOpacity 
+                       style={styles.sendButton} 
+                       onPress={sendNotificationToRole}
+                   >
+                       <Text style={styles.sendButtonText}>Send to All {selectedRole}S</Text>
+                   </TouchableOpacity>
+               </View>
+       
+               {/* Divider */}
+               <View style={styles.divider} />
+       
+               {/* Section 2: Send to Specific User */}
+               <View style={styles.sectionContainer}>
+                   <Text style={styles.sectionTitle}>Send to Specific User:</Text>
+                   
+                   <TextInput
+                       style={styles.input}
+                       placeholder="Enter User ID"
+                       value={userId}
+                       onChangeText={setUserId}
+                       keyboardType="numeric"
+                   />
+                   
+                   <TextInput
+                       style={styles.input}
+                       placeholder="Type your message here..."
+                       value={userMessage}
+                       onChangeText={setUserMessage}
+                       multiline
+                   />
+                   
+                   <TouchableOpacity 
+                       style={styles.sendButton} 
+                       onPress={sendNotificationToUser}
+                   >
+                       <Text style={styles.sendButtonText}>Send to User</Text>
+                   </TouchableOpacity>
+               </View>
+           </View>
+           
+       ) : (
                 <View style={styles.dashboard}>
                     <Text style={styles.subtitle}>Your Notifications:</Text>
                     <FlatList
                         data={notificationsList}
                         renderItem={renderNotificationItem}
                         keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+                        scrollEnabled={false}
                         ListEmptyComponent={
                             <Text style={styles.noNotifications}>
                                 {loading ? 'Loading...' : 'No notifications available'}
                             </Text>
                         }
                     />
+                
                 </View>
-            )}
-
+                
+                
+            )
+            }
+        </ScrollView>
             {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
-                    <TouchableOpacity onPress={() => navigation.navigate("Home", { role })} style={styles.navItem}>
+                    <TouchableOpacity onPress={() => navigation.navigate("oprator", { userRole })} style={styles.navItem}>
                       <Icon name="home-outline" size={25} color="#59B3F8" />
                       <Text style={styles.navText}>Home</Text>
                     </TouchableOpacity>
@@ -246,11 +283,11 @@ const notification = ({ route, navigation }) => {
                       <Icon name="calendar-clock" size={25} color="#59B3F8" />
                       <Text style={styles.navText}>Schedule</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+                    <TouchableOpacity onPress={() => navigation.navigate("feedback",{userRole})} style={styles.navItem}>
                       <Icon name="comment-outline" size={25} color="#59B3F8" />
                       <Text style={styles.navText}>Feedback</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{userRole})} style={styles.navItem}>
                       <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
                       <Text style={styles.navText}>Missing</Text>
                     </TouchableOpacity>
@@ -287,11 +324,19 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 15,
         elevation: 3,
+        borderColor: '#ddd',
+        borderWidth: 0.4,
+        //borderRadius: 5,
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        marginHorizontal: -16,
     },
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
-        borderRadius: 5,
+        borderRadius: 10,
         padding: 12,
         marginBottom: 15,
         fontSize: 16,
@@ -375,17 +420,87 @@ const styles = StyleSheet.create({
         backgroundColor: '#eee',
     },
     selectedRoleButton: {
-        backgroundColor: '#59B3F8',
+        backgroundColor: '#E57373',
     },
     roleButtonText: {
         color: '#333',
     },
     userSection: {
-        marginTop: 10,  // يمكنك تعديل هذه القيمة حسب الحاجة
-        paddingTop: 20,  // مسافة داخلية من الأعلى
-        //borderTopWidth: 1,  // خط فاصل اختياري
-        borderTopColor: '#eee',  // لون الخط الفاصل
+        marginTop: 10,  
+        paddingTop: 20,  
+        //borderTopWidth: 1, 
+        borderTopColor: '#eee',  
     },
+    notificationItem: {
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        backgroundColor: '#f9f9f9', 
+        borderRadius: 8,            
+        marginBottom: 10,          
+    },
+    notificationHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    notificationNumber: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#59B3F8',
+        marginLeft: 8,
+    },
+    notificationText: {
+        fontSize: 16,
+        marginBottom: 5,
+        color: '#333',
+    },
+    notificationDetails: {
+        fontSize: 12,
+        color: '#777',
+        fontStyle: 'italic',
+    },
+    sectionContainer: {
+        padding: 15,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
+        marginBottom: 15,
+        textAlign: 'auto',
+    },
+   
+    sendButton: {
+        backgroundColor: '#59B3F8',
+        borderWidth:1,
+        padding: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+        borderColor:'#59B3F8',
+        alignSelf:'center',
+    },
+    sendButtonText: {
+        color: '#fff',
+        //fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight:'40',
+    },
+    scrollContainer: {
+        padding: 16,
+        paddingTop: 0,
+        paddingBottom: 80, 
+      },
 });
+
+      
+
 
 export default notification; 

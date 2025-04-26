@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const busSchedule = () => {
+  
   const [schedules, setSchedules] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [showCityMenu, setShowCityMenu] = useState(false);
@@ -37,8 +38,8 @@ const busSchedule = () => {
   const loadSchedules = async () => {
     try {
       const url = selectedCity === 'Amman'
-        ? `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/amman/Bus_Stations`
-        : `https://5659-2a01-9700-8003-b900-6450-244b-d4d0-be5d.ngrok-free.app/zarqa/Bus_Stations`;
+        ? `https://f009-46-185-169-158.ngrok-free.app/amman/Bus_Stations`
+        : `https://f009-46-185-169-158.ngrok-free.app/zarqa/Bus_Stations`;
       
       const response = await fetch(url, {
         headers: {
@@ -81,8 +82,11 @@ const busSchedule = () => {
     }
   }, [selectedCity, token]);
 
-  const navigateToBusSituation = (scheduleId) => {
-    navigation.navigate('BusDetails', {  scheduleId });
+  const navigateToBusSituation = (stationName, busCount) => {
+    navigation.navigate('BusDetails', { 
+      stationName, 
+      busCount 
+    });
   };
   
   return (
@@ -90,10 +94,10 @@ const busSchedule = () => {
       <View style={styles.topBar}>
         <Text style={styles.appName}>HUrry</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+          <TouchableOpacity onPress={() => navigation.navigate("notification",{role:'STUDENT'})}>
             <Icon name="bell-outline" size={25} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")} style={{ marginLeft: 15 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("profileop",{role:'STUDENT'})} style={{ marginLeft: 15 }}>
             <Icon name="account-circle-outline" size={25} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -123,8 +127,8 @@ const busSchedule = () => {
       )}
       <ScrollView>
         {schedules.length > 0 ? (
-          schedules.map((schedule) => (
-            <View key={schedule.id} style={styles.scheduleCard}>
+          schedules.map((schedule , index) => (
+            <View key={schedule.id  || index} style={styles.scheduleCard}>
               <Text style={styles.text}>
                 <Text style={styles.label}>Bus Station Name:</Text> {schedule.nameOfBusStation}
               </Text>
@@ -150,7 +154,7 @@ const busSchedule = () => {
         )}
       </ScrollView>
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home",{role:'STUDENT'})} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("operator",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="home-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
@@ -158,11 +162,11 @@ const busSchedule = () => {
           <Icon name="calendar-clock" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Feedback")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("feedback",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="comment-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Feedback</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("ContactUs")} style={styles.navItem}>
+        <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role:'STUDENT'})} style={styles.navItem}>
           <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
           <Text style={styles.navText}>Missing</Text>
         </TouchableOpacity>
