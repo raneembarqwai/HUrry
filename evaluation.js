@@ -20,13 +20,12 @@ const evaluation = ({ route, navigation }) => {
     const [authToken, setAuthToken] = useState('');
     
    
-    const STUDENT_API_URL = '/questions/submit';
-    const OPERATOR_API_URL = '/questions/page';
+    const STUDENT_API_URL = 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/questions/submit';
+    const OPERATOR_API_URL = 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/questions/page';
     
-    // State for questions and answers
-    const [questions] = useState([
+    const [question] = useState([
         "How would you rate the overall experience?",
-        "Was the driver’s driving safe and comfortable?",
+        "Was the driver's driving safe and comfortable?",
         "How punctual was the trip (departure and arrival times)?",
         "How would you rate the cleanliness of the bus?",
         "Would you recommend this trip to a friend?"
@@ -42,7 +41,7 @@ const evaluation = ({ route, navigation }) => {
         ["Yes","Maybe","No"]
     ]);
     
-    const [answers, setAnswers] = useState(Array(questions.length).fill(''));
+    const [answer, setAnswers] = useState(Array(question.length).fill(''));
     const [busStationName, setStationName] = useState('');
     const [busNumber, setBusNumber] = useState('');
     const [loading, setLoading] = useState(false);
@@ -84,7 +83,7 @@ const evaluation = ({ route, navigation }) => {
     };
     
     const handleAnswerChange = (index, value) => {
-        const newAnswers = [...answers];
+        const newAnswers = [...answer];
         newAnswers[index] = value;
         setAnswers(newAnswers);
     };
@@ -98,7 +97,7 @@ const evaluation = ({ route, navigation }) => {
     };
     
     const handleSubmitEvaluation = async () => {
-        if (answers.some(a => !a)) {
+        if (answer.some(a => !a)) {
             Alert.alert('Error', 'Please answer all questions');
             return;
         }
@@ -108,25 +107,31 @@ const evaluation = ({ route, navigation }) => {
         const evaluationData = {
             busStationName,
             busNumber,
-            answers,
+            question: question.join(", "),
+           answer: answer.join(", "),
             sentAt: new Date().toISOString()
         };
-        
+        console.log("Data being sent:", evaluationData);
         try {
             await axios.post(STUDENT_API_URL, evaluationData, {
                 headers: {
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
                 }
             });
             Alert.alert('Success', 'Evaluation submitted successfully!');
-            // Reset form
-            setAnswers(Array(questions.length).fill(''));
+            
+            setAnswers(Array(question.length).fill(''));
             setStationName('');
             setBusNumber('');
             setShowQuestions(false);
         } catch (error) {
-            Alert.alert('Error', 'Failed to submit evaluation');
-            console.error('Submit evaluation error:', error);
+            console.error("Full error details:", {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            Alert.alert('Error', error.response?.data?.message || 'Failed to submit evaluation');
         } finally {
             setLoading(false);
         }
@@ -190,11 +195,11 @@ const evaluation = ({ route, navigation }) => {
                         <Text style={styles.infoValue}>     {busNumber}</Text>
                     </View>
                     
-                    {questions.map((question, index) => (
+                    {question.map((question, index) => (
                         <View key={index} style={styles.questionContainer}>
           <Text style={styles.questionText}><Icon name="comment-question" size={20} color="#59B3F8" /> {question}</Text>
                             <Picker
-                                selectedValue={answers[index]}
+                                selectedValue={answer[index]}
                                 onValueChange={(itemValue) => handleAnswerChange(index, itemValue)}
                                 style={styles.picker}
                                 dropdownIconColor="#59B3F8"
@@ -248,12 +253,15 @@ const evaluation = ({ route, navigation }) => {
             
             <Text style={[styles.sectionTitle, {marginTop: 10}]}>Evaluation Answers</Text>
             
-            {item.answers && item.answers.map((answer, ansIndex) => (
-                <View key={ansIndex} style={styles.answerCard}>
-                    <Text style={styles.questionText}>{questions[ansIndex]}</Text>
-                    <Text style={styles.answerText}>{answer || 'No answer'}</Text>
+            {item.question && item.answer && (
+            item.question.split(", ").map((q, qIndex) => (
+                <View key={qIndex} style={styles.answerCard}>
+                    <Text style={styles.questionTextt}><Icon name="comment-question" size={16} color="#59B3F8" /> {q}</Text>
+                    <Text style={styles.answerText}>
+                        {item.answer.split(", ")[qIndex] || 'No answer'}
+                    </Text>
                 </View>
-            ))}
+            )))}
             
             <Text style={styles.feedbackDate}>
                 <Icon name="clock-outline" size={14} color="#999" /> 
@@ -365,6 +373,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#59B3F8',
         marginBottom: 10,
+        textAlign:'center',
     },
     inputGroup: {
         marginBottom: 15,
@@ -425,6 +434,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#4A4A4A',
+        marginBottom: 10,
+    },
+    questionTextt: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
         marginBottom: 10,
     },
     picker: {

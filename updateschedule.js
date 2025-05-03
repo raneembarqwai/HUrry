@@ -14,8 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const API_URL = {
-  Zarqa: 'https://f009-46-185-169-158.ngrok-free.app/zarqa/add',
-  Amman:  'https://f009-46-185-169-158.ngrok-free.app/amman/add',
+  Zarqa: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/zarqa/add',
+  Amman:  'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/amman/add',
 }
 
 const updateschedule = () => {
@@ -77,7 +77,7 @@ const fetchSchedulesFromAPI = async () => {
     
 
     if (data && data.length > 0) {
-      const operatorId = data[0].operatorId;  // Assuming the operatorId is the same for all bus stations in the city
+      const operatorId = data[0].operatorId;  
       setNewSchedule(prevState => ({
         ...prevState,
         operatorId: operatorId,
@@ -180,7 +180,6 @@ const editSchedule = async (id, field, value) => {
     const token = await AsyncStorage.getItem('authToken');
     console.log('token', token);
     if (!token) {
-     // Alert.alert('Error', 'Token not found');
       return;
     }
 
@@ -250,14 +249,7 @@ return (
           onChangeText={(text) => setNewSchedule({ ...newSchedule, numberOfBuses: text })}
           keyboardType="numeric"
         />
-        {/* operatorId is read-only */}
-        <TextInput
-          //style={styles.input}
-         // placeholder="Operator ID"
-         // placeholderTextColor="#888"
-         // value={newSchedule.operatorId}
-        // editable={false}  // Prevent editing
-        />
+        
 
         <TouchableOpacity style={styles.addButton} onPress={addSchedule}>
           <Text style={styles.buttonText}>Add Schedule</Text>
@@ -280,11 +272,7 @@ return (
                   onChangeText={(text) => editSchedule(schedule.id, 'numberOfBuses', text)}
                   keyboardType="numeric"
                 />
-                <TextInput
-                  style={[styles.scheduleInput, styles.editableInput]}
-                  value={schedule.operatorId}
-                  editable={false}  // Prevent editing the operatorId
-               />
+                
               </>
             ) : (
               <>

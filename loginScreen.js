@@ -16,7 +16,7 @@ const loginScreen = ({ navigation }) => {
   
     try {
       // Make the API call to sign in
-      const response = await fetch("https://f009-46-185-169-158.ngrok-free.app/api2/login", {
+      const response = await fetch("https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/api2/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

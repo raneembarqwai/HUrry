@@ -5,17 +5,29 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BusDetails = ({ route, navigation }) => {
-  const { role } = route.params;
+  const { role,scheduleId,operatorEmail,numberOfBuses } = route.params;
   const [busDetails, setBusDetails] = useState([]);
 
   useEffect(() => {
     const fetchBusDetails = async () => {
       try {
+        const authToken = await AsyncStorage.getItem('authToken');
         
-        const apiUrl = 'https://f009-46-185-169-158.ngrok-free.app/buses/all'; 
+        console.log('Auth Token:', authToken);
+        if (!authToken) {
+          throw new Error('No authentication token found');
+        }
+        const apiUrl = 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/buses/all'; 
 
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -25,14 +37,11 @@ const BusDetails = ({ route, navigation }) => {
         setBusDetails(data);
 
         
-        //await AsyncStorage.setItem('busData', JSON.stringify(data));
+        
       } catch (error) {
         console.log('Error fetching bus details:', error);
         
-       // const storedData = await AsyncStorage.getItem('busData');
-        if (storedData) {
-          setBusDetails(JSON.parse(storedData));
-        }
+       
       }
     };
 

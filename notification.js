@@ -16,10 +16,10 @@ const notification = ({ route, navigation }) => {
 
     const API_URLS = {
         OPERATOR: {
-            SEND: 'https://f009-46-185-169-158.ngrok-free.app/announcements/create',
+            SEND: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/announcements/create',
         },
         OTHERS: {
-            GET: 'https://f009-46-185-169-158.ngrok-free.app/announcements/view'
+            GET: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/announcements/view'
         }
     };
 
@@ -50,6 +50,7 @@ const notification = ({ route, navigation }) => {
             });
             
             const data = await response.json();
+            console.log('Notifications data:', data);
             if (response.ok) {
                 setNotificationsList(Array.isArray(data) ? data : []);
             } else {
@@ -144,17 +145,57 @@ const notification = ({ route, navigation }) => {
         }
     };
 
+    const deleteNotificationFrontend = (notificationId) => {
+        // Remove the notification from the state (frontend-only)
+        setNotificationsList(notificationsList.filter(item => item.id !== notificationId));
+        Alert.alert('Success', 'Notification deleted');
+    };
+
     const renderNotificationItem = ({ item, index }) => {
+        const isPersonalNotification = item.userId && item.userId !== '';
         return (
-            <View style={styles.notificationItem}>
+            <View style={[styles.notificationItem,
+                isPersonalNotification && styles.personalNotificationItem
+            ]}>
                 <View style={styles.notificationHeader}>
-                <Icon name="bell-alert-outline" size={20} color="#59B3F8" />
-                <Text style={styles.notificationNumber}> {index + 1}</Text>
+                <Icon name="bell-alert-outline" 
+                    size={20} 
+                    color={isPersonalNotification ? '#FF5252' : '#59B3F8'} 
+                />
+                <Text style={[
+                    styles.notificationNumber,
+                    isPersonalNotification && styles.personalNotificationText
+                ]}> {index + 1}</Text>
             </View>
-                <Text style={styles.notificationText}>{item.message}</Text>
-                <Text style={styles.notificationDetails}>
+                <Text style={[
+                styles.notificationText,
+                isPersonalNotification && styles.personalNotificationText
+            ]}>{item.message}</Text>
+                <Text style={[ styles.notificationDetails,
+                isPersonalNotification && styles.personalNotificationText
+            ]}>
                     Sent at: {new Date(item.sentAt).toLocaleString()}
                 </Text>
+                {isPersonalNotification && (
+                <Text style={styles.personalNotificationLabel}>Personal Notification</Text>
+            )}
+            {/* Delete Button */}
+            <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => {
+                        Alert.alert(
+                            'Confirm Delete',
+                            'Are you sure you want to delete this notification?',
+                            [
+                                { text: 'Cancel', style: 'cancel' },
+                                { text: 'Delete', onPress: () => deleteNotificationFrontend(item.id), style: 'destructive' },
+                            ]
+                        );
+                    }}
+                >
+                    <Icon name="delete-outline" size={20} color="#FF5252" />
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
             </View>
         );
     };
@@ -175,8 +216,11 @@ const notification = ({ route, navigation }) => {
                    </View>
                  </View>
                  <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={styles.scrollContainer}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={true} // Enable bounce effect for natural scrolling
+                    alwaysBounceVertical={true} // Allow bouncing even if content is small
+                    showsVerticalScrollIndicator={true} // Show scroll indicator for UX
       >
 
             <Text style={styles.title}>Notifications {userRole}</Text>
@@ -232,7 +276,7 @@ const notification = ({ route, navigation }) => {
                        placeholder="Enter User ID"
                        value={userId}
                        onChangeText={setUserId}
-                       keyboardType="numeric"
+                      // keyboardType="numeric"
                    />
                    
                    <TextInput
@@ -300,7 +344,7 @@ const notification = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
+        padding: 9,
         paddingTop: 0,
         paddingBottom: 60,
         backgroundColor: '#f8ffff',
@@ -331,7 +375,7 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        marginHorizontal: -16,
+        marginHorizontal: -16,  
     },
     input: {
         borderWidth: 1,
@@ -498,6 +542,37 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         paddingBottom: 80, 
       },
+      personalNotificationItem: {
+        backgroundColor: '#FFEBEE',
+        borderLeftWidth: 3,
+        borderLeftColor: '#FF5252',
+    },
+    personalNotificationText: {
+        color: '#D32F2F',
+    },
+    personalNotificationLabel: {
+        fontSize: 12,
+        color: '#FF5252',
+        fontWeight: 'bold',
+        marginTop: 5,
+    },
+    deleteButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginTop: 10,
+        padding: 8,
+        backgroundColor: '#FFEBEE',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#FF5252',
+    },
+    deleteButtonText: {
+        color: '#FF5252',
+        fontSize: 14,
+        marginLeft: 5,
+        fontWeight: '500',
+    },
 });
 
       

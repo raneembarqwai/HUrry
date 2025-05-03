@@ -38,8 +38,8 @@ const busSchedule = () => {
   const loadSchedules = async () => {
     try {
       const url = selectedCity === 'Amman'
-        ? `https://f009-46-185-169-158.ngrok-free.app/amman/Bus_Stations`
-        : `https://f009-46-185-169-158.ngrok-free.app/zarqa/Bus_Stations`;
+        ? `https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/amman/Bus_Stations`
+        : `https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/zarqa/Bus_Stations`;
       
       const response = await fetch(url, {
         headers: {
@@ -49,31 +49,15 @@ const busSchedule = () => {
       
       const data = await response.json();
       console.log("Fetched data from database:", data);
-      // Save fetched data to local storage
-     // await AsyncStorage.setItem(`Schedules_${selectedCity}`, JSON.stringify(data));
       setSchedules(data);
     } catch (error) {
       console.error('Failed to fetch schedules from database:', error);
-      Alert.alert('Error', 'Failed to load schedules from the database. Loading from local storage.');
-      loadSchedulesFromStorage();
+     
+      
     }
   };
 
-  const loadSchedulesFromStorage = async () => {
-    try {
-     // const storedSchedules = await AsyncStorage.getItem(`Schedules_${selectedCity}`);
-      console.log("Loaded data from local storage:", storedSchedules);
-      if (storedSchedules) {
-        setSchedules(JSON.parse(storedSchedules));
-      } else {
-        console.log("No data found for the selected city in local storage.");
-        setSchedules([]);
-      }
-    } catch (error) {
-      console.error('Error loading schedules from storage:', error);
-      Alert.alert('Error', 'Failed to load schedules from local storage.');
-    }
-  };
+  
 
   useEffect(() => {
     if (selectedCity) {
@@ -82,10 +66,10 @@ const busSchedule = () => {
     }
   }, [selectedCity, token]);
 
-  const navigateToBusSituation = (stationName, busCount) => {
+  const navigateToBusSituation = (scheduleId) => {
+    const scheduleToUpdate = schedules.find(schedule => schedule.id === scheduleId);
     navigation.navigate('BusDetails', { 
-      stationName, 
-      busCount 
+      scheduleId: scheduleId, numberOfBuses: scheduleToUpdate.numberOfBuses ,operatorEmail:scheduleToUpdate.operatorEmail
     });
   };
   
@@ -143,7 +127,7 @@ const busSchedule = () => {
               </Text>
               <TouchableOpacity
                 style={styles.linkButton}
-                onPress={() => navigateToBusSituation(schedule.nameOfBusStation,schedule.numberOfBuses)}
+                onPress={() => navigateToBusSituation(schedule.id)}
               >
                 <Text style={styles.linkText}>View Bus</Text>
               </TouchableOpacity>

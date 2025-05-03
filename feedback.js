@@ -28,8 +28,8 @@ const feedback = ({ route, navigation }) => {
 
   
   const API_URLS = {
-    STUDENT: 'https://f009-46-185-169-158.ngrok-free.app/comments/submit',
-    OPERATOR: 'https://f009-46-185-169-158.ngrok-free.app/comments/page'
+    STUDENT: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/comments/submit',
+    OPERATOR: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/comments/page'
   };
 
   useEffect(() => {

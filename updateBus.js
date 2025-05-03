@@ -28,16 +28,6 @@ const updateBus = ({ route, navigation }) => {
   const [token, setToken] = useState('');
 
   useEffect(() => {
-    const loadSavedData = async () => {
-      try {
-        //const storedData = await AsyncStorage.getItem('busData');
-        if (storedData) {
-         setSavedData(JSON.parse(storedData));
-        }
-      } catch (error) {
-        console.log('Error loading saved data:', error);
-      }
-    };
     
     const loadToken = async () => {
       try {
@@ -49,8 +39,7 @@ const updateBus = ({ route, navigation }) => {
         console.log('Error loading token:', error);
       }
     };
-    
-    loadSavedData();
+  
     loadToken();
   }, []);
 
@@ -71,7 +60,7 @@ const updateBus = ({ route, navigation }) => {
     }
 
     try {
-      const response = await fetch('https://f009-46-185-169-158.ngrok-free.app/buses/add', {
+      const response = await fetch('https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/buses/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

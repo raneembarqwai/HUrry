@@ -76,20 +76,20 @@ const operatorScreen = ({ navigation, route }) => {
       action: () => navigation.navigate("feedback" , { role }),
     },
     {
-      title: "Evaluate Drivers",
-      icon: "account-check-outline",
-      action: () => navigation.navigate("EvaluateDrivers"),
-    },
-    {
       title: "Notify Users",
       icon: "bell-ring-outline",
       action: () => navigation.navigate("notification" , { role }),
     },
     {
-      title: "Evaluation",
+      title: "Evaluations",
       icon: "file-document-edit",
       action: () => navigation.navigate("evaluation", { role }),
     },
+    {
+    title: "Profile",
+    icon: "account-circle-outline",
+    action: () => navigation.navigate("profileop", { role }),
+  },
   ];
   
   const getTimeBasedGreeting = () => {

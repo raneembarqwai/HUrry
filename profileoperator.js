@@ -27,16 +27,16 @@ const profileoperator = ({ route, navigation }) => {
  
   const API_URLS = {
     STUDENT: {
-      GET: 'https://f009-46-185-169-158.ngrok-free.app/student/profile',
-      PUT: 'https://f009-46-185-169-158.ngrok-free.app/student/profile'
+      GET: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/student/profile',
+      PUT: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/student/profile'
     },
     DRIVER: {
-      GET: 'https://f009-46-185-169-158.ngrok-free.app/driver/profile',
-      PUT: 'https://f009-46-185-169-158.ngrok-free.app/driver/profile'
+      GET: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/driver/profile',
+      PUT: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/driver/profile'
     },
     OPERATOR: {
-      GET: 'https://f009-46-185-169-158.ngrok-free.app/operator/profile',
-      PUT: 'https://f009-46-185-169-158.ngrok-free.app/operator/profile'
+      GET: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/operator/profile',
+      PUT: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/operator/profile'
     }
   };
 
@@ -64,6 +64,12 @@ const profileoperator = ({ route, navigation }) => {
 
       const data = await response.json();
       
+      if (role === 'OPERATOR') {
+        await AsyncStorage.setItem('operatorInfo', JSON.stringify({
+          name: data.name,  // تم تغيير من data.operatorName إلى data.name
+          email: data.email // تم تغيير من data.operatorEmail إلى data.email
+        }));
+      }
       
       const updatedData = {
         name: data.name || '',
@@ -358,7 +364,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   scrollContainer: {
-    padding: 25,
+    padding: 20,
     paddingBottom: 20,
   },
   topBar: {
