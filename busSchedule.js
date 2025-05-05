@@ -120,10 +120,10 @@ const busSchedule = () => {
                 <Text style={styles.label}>Number of Buses:</Text> {schedule.numberOfBuses}
               </Text>
               <Text style={styles.text}>
-                <Text style={styles.label}>Operator Name:</Text> {schedule.operatorEmail || 'Unknown'}
+                <Text style={styles.label}>Operator Name:</Text> {schedule.operatorName || 'Unknown'}
               </Text>
               <Text style={styles.text}>
-                <Text style={styles.label}>Operator Email:</Text> {schedule.operatorName || 'Unknown'}
+                <Text style={styles.label}>Operator Email:</Text> {schedule.operatorEmail || 'Unknown'}
               </Text>
               <TouchableOpacity
                 style={styles.linkButton}
