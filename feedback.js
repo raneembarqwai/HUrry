@@ -113,7 +113,7 @@ const feedback = ({ route, navigation }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch feedbacks');
+        throw new Error(data.message || 'Failed to fetch feedbacks , Station not found');
       }
 
       const formattedFeedbacks = Array.isArray(data) ? data.map(item => ({
