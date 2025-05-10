@@ -10,7 +10,9 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Modal,
+  Pressable
 } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,18 +20,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const feedback = ({ route, navigation }) => {
   const { role } = route.params;
   const [formData, setFormData] = useState({
-    busStationName: '',
-    busNumber: '',
-    content: ''
+    content: '',
+    receiverEmail: '',
+    receiverRole: ''
   });
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState('');
-
+  const [modalVisible, setModalVisible] = useState(false);
   
+  const receiverRoles = ['STUDENT', 'OPERATOR', 'DRIVER'];
+  const filteredReceiverRoles = receiverRoles.filter(r => r !== role);
+
   const API_URLS = {
-    STUDENT: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/comments/submit',
-    OPERATOR: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/comments/page'
+    SEND: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/comments/submit',
+    RECEIVE: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c6e6.ngrok-free.app/comments/page'
   };
 
   useEffect(() => {
@@ -38,9 +43,7 @@ const feedback = ({ route, navigation }) => {
         const authToken = await AsyncStorage.getItem('authToken');
         if (authToken) {
           setToken(authToken);
-          if (role === 'OPERATOR') {
-            await fetchFeedbacks(authToken);
-          }
+          await fetchMessages(authToken);
         }
       } catch (error) {
         console.error('Token error:', error);
@@ -51,14 +54,14 @@ const feedback = ({ route, navigation }) => {
   }, [role]);
 
   const handleSubmit = async () => {
-    if (!formData.busStationName || !formData.content) {
+    if (!formData.content || !formData.receiverEmail || !formData.receiverRole) {
       Alert.alert('Error', 'Please fill all required fields');
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(API_URLS.STUDENT, {
+      const response = await fetch(API_URLS.SEND, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,8 +69,8 @@ const feedback = ({ route, navigation }) => {
         },
         body: JSON.stringify({
           content: formData.content,
-          busStationName: formData.busStationName,
-          busNumber: formData.busNumber || '0'
+          receiverEmail: formData.receiverEmail,
+          receiverRole: formData.receiverRole
         }),
       });
 
@@ -80,23 +83,24 @@ const feedback = ({ route, navigation }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Submission failed');
+        throw new Error(data.message || 'Message sending failed');
       }
 
-      Alert.alert('Success', 'Feedback submitted successfully!');
-      setFormData({ busStationName: '', busNumber: '', content: '' });
+      Alert.alert('Success', 'Message sent successfully!');
+      setFormData({ content: '', receiverEmail: '', receiverRole: '' });
+      await fetchMessages(token);
     } catch (error) {
       console.error('Submission error:', error);
-      Alert.alert('Error', error.message || 'Failed to submit feedback');
+      Alert.alert('Error', error.message || 'Failed to send message');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchFeedbacks = async (authToken) => {
+  const fetchMessages = async (authToken) => {
     try {
       setLoading(true);
-      const response = await fetch(API_URLS.OPERATOR, {
+      const response = await fetch(API_URLS.RECEIVE, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -113,22 +117,23 @@ const feedback = ({ route, navigation }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch feedbacks , Station not found');
+        throw new Error(data.message || 'Failed to fetch messages');
       }
 
-      const formattedFeedbacks = Array.isArray(data) ? data.map(item => ({
+      const formattedMessages = Array.isArray(data) ? data.map(item => ({
         content: item.content || '',
-        studentName: item.studentName || 'Unknown',
-        studentEmail: item.studentEmail || 'N/A',
-        busStationName: item.busStationName || '',
-        busNumber: item.bus || '0',
-        sendAt: item.date || new Date().toISOString()
+        senderName: item.senderName || 'Unknown',
+        senderEmail: item.senderEmail || 'N/A',
+        senderRole: item.senderRole || '',
+        receiverEmail: item.receiverEmail || '',
+        receiverRole: item.receiverRole || '',
+        sentAt: item.sentAt || new Date().toISOString()
       })) : [];
 
-      setFeedbacks(formattedFeedbacks);
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Fetch error:', error);
-      Alert.alert('Error', error.message || 'Failed to load feedbacks');
+      Alert.alert('Error', error.message || 'Failed to load messages');
     } finally {
       setLoading(false);
     }
@@ -139,26 +144,26 @@ const feedback = ({ route, navigation }) => {
       <View style={styles.feedbackHeader}>
         <Icon name="account-circle" size={20} color="#59B3F8" />
         <Text style={styles.feedbackNumber}>{index + 1}</Text>
-        <Text style={styles.feedbackTitle}>FEEDBACK</Text>
+        <Text style={styles.feedbackTitle}>Message</Text>
       </View>
       <Text style={styles.feedbackContent}>{item.content}</Text>
       <View style={styles.feedbackDetails}>
         <Text style={styles.detailText}>
-          <Icon name="account" size={14} color="#666" /> {item.studentName}
+          <Icon name="account" size={14} color="#666" /> From: {item.senderName} ({item.senderRole})
         </Text>
         <Text style={styles.detailText}>
-          <Icon name="email" size={14} color="#666" /> {item.studentEmail}
+          <Icon name="email" size={14} color="#666" /> Sender Email: {item.senderEmail}
         </Text>
         <Text style={styles.detailText}>
-          <Icon name="bus-stop" size={14} color="#666" /> {item.busStationName}
+          <Icon name="account" size={14} color="#666" /> To: {item.receiverRole}
         </Text>
         <Text style={styles.detailText}>
-          <Icon name="bus" size={14} color="#666" /> Bus: {item.busNumber}
+          <Icon name="email" size={14} color="#666" /> Receiver Email: {item.receiverEmail}
         </Text>
       </View>
       <Text style={styles.feedbackDate}>
         <Icon name="clock-outline" size={14} color="#999" /> 
-        {item.sendAt ? new Date(item.sendAt).toLocaleString() : 'Unknown date'}
+        {item.sentAt ? new Date(item.sentAt).toLocaleString() : 'Unknown date'}
       </Text>
     </View>
   );
@@ -182,7 +187,7 @@ const feedback = ({ route, navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerText}>
-            {role === 'STUDENT' ? 'Submit Feedback' : 'Feedback List'}
+            {role === 'STUDENT' ? 'Messages' : 'Messages'}
           </Text>
         </View>
 
@@ -192,59 +197,96 @@ const feedback = ({ route, navigation }) => {
           </View>
         )}
 
-        {role === 'STUDENT' ? (
-          <ScrollView style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Bus Station Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter station name..."
-                value={formData.busStationName}
-                onChangeText={(text) => setFormData({...formData, busStationName: text})}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Bus Number</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Optional"
-                value={formData.busNumber}
-                onChangeText={(text) => setFormData({...formData, busNumber: text})}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Your Feedback</Text>
-              <TextInput
-                style={[styles.input, styles.multiline]}
-                placeholder="Write your feedback here..."
-                value={formData.content}
-                onChangeText={(text) => setFormData({...formData, content: text})}
-                multiline
-                numberOfLines={4}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.buttonContainer}
-              onPress={handleSubmit}
-              disabled={loading}
+        <ScrollView style={styles.form}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Your Message</Text>
+            <TextInput
+              style={[styles.input, styles.multiline]}
+              placeholder="Write your message here..."
+              value={formData.content}
+              onChangeText={(text) => setFormData({...formData, content: text})}
+              multiline
+              numberOfLines={4}
+            />
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Receiver Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter receiver email..."
+              value={formData.receiverEmail}
+              onChangeText={(text) => setFormData({...formData, receiverEmail: text})}
+              keyboardType="email-address"
+            />
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Receiver Role</Text>
+            <TouchableOpacity 
+              style={styles.dropdownInput}
+              onPress={() => setModalVisible(true)}
             >
-              <Text style={styles.buttonText}>Submit Feedback</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        ) : (
-          <FlatList
-            data={feedbacks}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={styles.listContainer}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>
-                {loading ? 'Loading...' : 'No feedbacks found'}
+              <Text style={formData.receiverRole ? styles.dropdownText : styles.dropdownPlaceholder}>
+                {formData.receiverRole || 'Select receiver role'}
               </Text>
-            }
-          />
-        )}
+              <Icon name="chevron-down" size={20} color="#666" />
+            </TouchableOpacity>
+            
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  {filteredReceiverRoles.map((roleItem) => (
+                    <Pressable
+                      key={roleItem}
+                      style={styles.modalItem}
+                      onPress={() => {
+                        setFormData({...formData, receiverRole: roleItem});
+                        setModalVisible(false);
+                      }}
+                    >
+                      <Text style={styles.modalItemText}>{roleItem}</Text>
+                    </Pressable>
+                  ))}
+                  <Pressable
+                    style={[styles.modalItem, {borderTopWidth: 1, borderTopColor: '#eee'}]}
+                    onPress={() => {
+                      setFormData({...formData, receiverRole: ''});
+                      setModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.modalItemText}>Clear Selection</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Modal>
+          </View>
+          
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>Send Message</Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        <FlatList
+          data={messages}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {loading ? 'Loading...' : 'No messages found'}
+            </Text>
+          }
+        />
 
         {/* Bottom Navigation */}
         <View style={styles.bottomNav}>
@@ -258,7 +300,7 @@ const feedback = ({ route, navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("feedback",{role})} style={styles.navItem}>
             <Icon name="comment-outline" size={25} color="#59B3F8" />
-            <Text style={styles.navText}>Feedback</Text>
+            <Text style={styles.navText}>Messages</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("ContactUs",{role})} style={styles.navItem}>
             <Icon name="alert-circle-outline" size={25} color="#59B3F8" />
@@ -319,6 +361,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginTop: 10,
+  },
+  dropdownInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: '#FCFCFC',
+    fontSize: 16,
+    color: "#333",
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dropdownPlaceholder: {
+    fontSize: 16,
+    color: '#999',
   },
   multiline: {
     minHeight: 100,
@@ -455,20 +518,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  buttonContaine: {
-    marginTop: 20,
-    borderRadius: 8,
-    backgroundColor: '#59B3F8',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#4a9bd6',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '60%',
+  },
+  modalItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalItemText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 
