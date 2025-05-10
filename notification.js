@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const notification = ({ route, navigation }) => {
     const { role: userRole } = route.params;
-    //const { role: rolee } = route.params;
     const [message, setMessage] = useState('');
     const [userMessage, setUserMessage] = useState('');
     const [selectedRole, setSelectedRole] = useState('STUDENT');
@@ -13,6 +12,7 @@ const notification = ({ route, navigation }) => {
     const [notificationsList, setNotificationsList] = useState([]);
     const [token, setToken] = useState('');
     const [loading, setLoading] = useState(false);
+    const [notificationType, setNotificationType] = useState('ANNOUNCEMENT'); // 'ANNOUNCEMENT' or 'EMERGENCY'
 
     const API_URLS = {
         OPERATOR: {
@@ -84,7 +84,8 @@ const notification = ({ route, navigation }) => {
                 },
                 body: JSON.stringify({
                     role: selectedRole,
-                    message: message
+                    message: message,
+                    type: notificationType // Add notification type to the request
                 }),
             });
             
@@ -127,7 +128,8 @@ const notification = ({ route, navigation }) => {
                 body: JSON.stringify({
                     role: selectedRole,
                     message: userMessage,
-                    userId: userId
+                    userId: userId,
+                    type: notificationType // Add notification type to the request
                 }),
             });
             
@@ -146,41 +148,46 @@ const notification = ({ route, navigation }) => {
     };
 
     const deleteNotificationFrontend = (notificationId) => {
-        // Remove the notification from the state (frontend-only)
         setNotificationsList(notificationsList.filter(item => item.id !== notificationId));
         Alert.alert('Success', 'Notification deleted');
     };
 
     const renderNotificationItem = ({ item, index }) => {
-        const isPersonalNotification = item.userId && item.userId !== '';
+        const isEmergency = item.type === 'EMERGENCY';
+      
         return (
-            <View style={[styles.notificationItem,
-                isPersonalNotification && styles.personalNotificationItem
+            <View style={[
+                styles.notificationItem,
+                isEmergency && styles.emergencyNotification
             ]}>
                 <View style={styles.notificationHeader}>
-                <Icon name="bell-alert-outline" 
-                    size={20} 
-                    color={isPersonalNotification ? '#FF5252' : '#59B3F8'} 
-                />
+                    <Icon 
+                        name={isEmergency ? "alert-circle-outline" : "bell-alert-outline"} 
+                        size={20} 
+                        color={isEmergency ? '#FF5252' : '#59B3F8'} 
+                    />
+                    <Text style={[
+                        styles.notificationNumber,
+                        isEmergency && styles.emergencyText
+                    ]}> {index + 1}</Text>
+                </View>
                 <Text style={[
-                    styles.notificationNumber,
-                    isPersonalNotification && styles.personalNotificationText
-                ]}> {index + 1}</Text>
-            </View>
+                    styles.notificationText,
+                    isEmergency && styles.emergencyText
+                ]}>{item.message}</Text>
                 <Text style={[
-                styles.notificationText,
-                isPersonalNotification && styles.personalNotificationText
-            ]}>{item.message}</Text>
-                <Text style={[ styles.notificationDetails,
-                isPersonalNotification && styles.personalNotificationText
-            ]}>
+                    styles.notificationDetails,
+                    isEmergency && styles.emergencyText
+                ]}>
                     Sent at: {new Date(item.sentAt).toLocaleString()}
                 </Text>
-                {isPersonalNotification && (
-                <Text style={styles.personalNotificationLabel}>Personal Notification</Text>
-            )}
-            {/* Delete Button */}
-            <TouchableOpacity
+               
+                {isEmergency && (
+                    <Text style={styles.emergencyTag}>EMERGENCY</Text>
+                )}
+                
+                {/* Delete Button */}
+                <TouchableOpacity
                     style={styles.deleteButton}
                     onPress={() => {
                         Alert.alert(
@@ -218,9 +225,9 @@ const notification = ({ route, navigation }) => {
                  <ScrollView 
                     contentContainerStyle={styles.scrollContainer}
                     keyboardShouldPersistTaps="handled"
-                    bounces={true} // Enable bounce effect for natural scrolling
-                    alwaysBounceVertical={true} // Allow bouncing even if content is small
-                    showsVerticalScrollIndicator={true} // Show scroll indicator for UX
+                    bounces={true}
+                    alwaysBounceVertical={true}
+                    showsVerticalScrollIndicator={true}
       >
 
             <Text style={styles.title}>Notifications {userRole}</Text>
@@ -229,6 +236,28 @@ const notification = ({ route, navigation }) => {
 
             {userRole === 'OPERATOR' ? (
                <View style={styles.dashboard}>
+               {/* Notification Type Selector */}
+               <View style={styles.typeSelector}>
+                   <TouchableOpacity
+                       style={[
+                           styles.typeButton, 
+                           notificationType === 'ANNOUNCEMENT' && styles.selectedTypeButton
+                       ]}
+                       onPress={() => setNotificationType('ANNOUNCEMENT')}
+                   >
+                       <Text style={styles.typeButtonText}>Announcement</Text>
+                   </TouchableOpacity>
+                   <TouchableOpacity
+                       style={[
+                           styles.typeButton, 
+                           notificationType === 'EMERGENCY' && styles.emergencyTypeButton
+                       ]}
+                       onPress={() => setNotificationType('EMERGENCY')}
+                   >
+                       <Text style={styles.typeButtonText}>Emergency</Text>
+                   </TouchableOpacity>
+               </View>
+               
                {/* Section 1: Send to All Users */}
                <View style={styles.sectionContainer}>
                    <Text style={styles.sectionTitle}>Send to All: </Text>
@@ -257,10 +286,15 @@ const notification = ({ route, navigation }) => {
                    />
                    
                    <TouchableOpacity 
-                       style={styles.sendButton} 
+                       style={[
+                           styles.sendButton,
+                           notificationType === 'EMERGENCY' && styles.emergencySendButton
+                       ]} 
                        onPress={sendNotificationToRole}
                    >
-                       <Text style={styles.sendButtonText}>Send to All {selectedRole}S</Text>
+                       <Text style={styles.sendButtonText}>
+                           Send to All {selectedRole}S ({notificationType === 'EMERGENCY' ? 'EMERGENCY' : 'Announcement'})
+                       </Text>
                    </TouchableOpacity>
                </View>
        
@@ -276,7 +310,6 @@ const notification = ({ route, navigation }) => {
                        placeholder="Enter User ID"
                        value={userId}
                        onChangeText={setUserId}
-                      // keyboardType="numeric"
                    />
                    
                    <TextInput
@@ -288,10 +321,15 @@ const notification = ({ route, navigation }) => {
                    />
                    
                    <TouchableOpacity 
-                       style={styles.sendButton} 
+                       style={[
+                           styles.sendButton,
+                           notificationType === 'EMERGENCY' && styles.emergencySendButton
+                       ]} 
                        onPress={sendNotificationToUser}
                    >
-                       <Text style={styles.sendButtonText}>Send to User</Text>
+                       <Text style={styles.sendButtonText}>
+                           Send to User ({notificationType === 'EMERGENCY' ? 'EMERGENCY' : 'Announcement'})
+                       </Text>
                    </TouchableOpacity>
                </View>
            </View>
@@ -310,12 +348,8 @@ const notification = ({ route, navigation }) => {
                             </Text>
                         }
                     />
-                
                 </View>
-                
-                
-            )
-            }
+            )}
         </ScrollView>
             {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
@@ -350,17 +384,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8ffff',
     },
     title: {
-        //fontSize: 24,
-       // fontWeight: 'bold',
-       // textAlign: 'center',
-       // marginVertical: 10,
-       // color: '#333',
-       fontSize: 28,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#2C3E50',
-    marginTop: 20,
+        fontSize: 28,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginBottom: 20,
+        color: '#2C3E50',
+        marginTop: 20,
     },
     dashboard: {
         backgroundColor: '#fff',
@@ -370,7 +399,6 @@ const styles = StyleSheet.create({
         elevation: 3,
         borderColor: '#ddd',
         borderWidth: 0.4,
-        //borderRadius: 5,
         shadowOpacity: 0.2,
         shadowRadius: 5,
         shadowColor: '#000',
@@ -399,28 +427,138 @@ const styles = StyleSheet.create({
         padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
+        backgroundColor: '#f9f9f9', 
+        borderRadius: 8,            
+        marginBottom: 10,          
+    },
+    emergencyNotification: {
+        backgroundColor: '#FFEBEE',
+        borderLeftWidth: 4,
+        borderLeftColor: '#FF5252',
+    },
+    notificationHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    notificationNumber: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#59B3F8',
+        marginLeft: 8,
+    },
+    emergencyText: {
+        color: '#D32F2F',
     },
     notificationText: {
         fontSize: 16,
         marginBottom: 5,
+        color: '#333',
     },
     notificationDetails: {
         fontSize: 12,
         color: '#777',
+        fontStyle: 'italic',
     },
-    noNotifications: {
-        textAlign: 'center',
-        marginTop: 20,
-        color: '#888',
+    emergencyTag: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: '#FF5252',
+        color: 'white',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 10,
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    sectionContainer: {
+        padding: 15,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
+        marginBottom: 15,
+        textAlign: 'auto',
+    },
+    typeSelector: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 15,
+    },
+    typeButton: {
+        padding: 10,
+        borderRadius: 5,
+        backgroundColor: '#eee',
+        flex: 1,
+        marginHorizontal: 5,
+        alignItems: 'center',
+    },
+    selectedTypeButton: {
+        backgroundColor: '#59B3F8',
+    },
+    emergencyTypeButton: {
+        backgroundColor: '#FF5252',
+    },
+    typeButtonText: {
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    sendButton: {
+        backgroundColor: '#59B3F8',
+        borderWidth:1,
+        padding: 12,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+        borderColor:'#59B3F8',
+        alignSelf:'center',
+    },
+    emergencySendButton: {
+        backgroundColor: '#FF5252',
+        borderColor: '#FF5252',
+    },
+    sendButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight:'40',
+    },
+    scrollContainer: {
+        padding: 16,
+        paddingTop: 0,
+        paddingBottom: 80, 
+    },
+    deleteButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginTop: 10,
+        padding: 8,
+        backgroundColor: '#FFEBEE',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#FF5252',
+    },
+    deleteButtonText: {
+        color: '#FF5252',
+        fontSize: 14,
+        marginLeft: 5,
+        fontWeight: '500',
     },
     topBar: {
         flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#59B3F8",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: -20,
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#59B3F8",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginHorizontal: -20,
     },
     appName: {
         fontSize: 20,
@@ -469,113 +607,11 @@ const styles = StyleSheet.create({
     roleButtonText: {
         color: '#333',
     },
-    userSection: {
-        marginTop: 10,  
-        paddingTop: 20,  
-        //borderTopWidth: 1, 
-        borderTopColor: '#eee',  
-    },
-    notificationItem: {
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        backgroundColor: '#f9f9f9', 
-        borderRadius: 8,            
-        marginBottom: 10,          
-    },
-    notificationHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    notificationNumber: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#59B3F8',
-        marginLeft: 8,
-    },
-    notificationText: {
-        fontSize: 16,
-        marginBottom: 5,
-        color: '#333',
-    },
-    notificationDetails: {
-        fontSize: 12,
-        color: '#777',
-        fontStyle: 'italic',
-    },
-    sectionContainer: {
-        padding: 15,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 15,
-        textAlign: 'auto',
-    },
-   
-    sendButton: {
-        backgroundColor: '#59B3F8',
-        borderWidth:1,
-        padding: 12,
-        borderRadius: 10,
-        alignItems: 'center',
-        marginTop: 10,
-        borderColor:'#59B3F8',
-        alignSelf:'center',
-    },
-    sendButtonText: {
-        color: '#fff',
-        //fontWeight: 'bold',
-        fontSize: 14,
-        fontWeight:'40',
-    },
-    scrollContainer: {
-        padding: 16,
-        paddingTop: 0,
-        paddingBottom: 80, 
-      },
-      personalNotificationItem: {
-        backgroundColor: '#FFEBEE',
-        borderLeftWidth: 3,
-        borderLeftColor: '#FF5252',
-    },
-    personalNotificationText: {
-        color: '#D32F2F',
-    },
-    personalNotificationLabel: {
-        fontSize: 12,
-        color: '#FF5252',
-        fontWeight: 'bold',
-        marginTop: 5,
-    },
-    deleteButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'flex-end',
-        marginTop: 10,
-        padding: 8,
-        backgroundColor: '#FFEBEE',
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: '#FF5252',
-    },
-    deleteButtonText: {
-        color: '#FF5252',
-        fontSize: 14,
-        marginLeft: 5,
-        fontWeight: '500',
+    divider: {
+        height: 1,
+        backgroundColor: '#e0e0e0',
+        marginVertical: 15,
     },
 });
 
-      
-
-
-export default notification; 
+export default notification;
