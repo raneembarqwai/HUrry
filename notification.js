@@ -16,10 +16,10 @@ const notification = ({ route, navigation }) => {
 
     const API_URLS = {
         OPERATOR: {
-            SEND: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/announcements/create',
+            SEND: 'https://5d60-2a01-9700-80d9-5f00-2d46-e709-cbb5-9b72.ngrok-free.app/announcements/create',
         },
         OTHERS: {
-            GET: 'https://2fbd-2a01-9700-80db-d300-10c1-b5b3-7169-c9e6.ngrok-free.app/announcements/view'
+            GET: 'https://5d60-2a01-9700-80d9-5f00-2d46-e709-cbb5-9b72.ngrok-free.app/announcements/view'
         }
     };
 
@@ -449,6 +449,7 @@ const styles = StyleSheet.create({
     },
     emergencyText: {
         color: '#D32F2F',
+        fontWeight: 'bold',
     },
     notificationText: {
         fontSize: 16,
@@ -472,6 +473,16 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
     },
+    emergencyBadge: {
+    backgroundColor: '#FF5252',
+    color: 'white',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 10,
+},
     sectionContainer: {
         padding: 15,
         backgroundColor: '#fff',
