@@ -289,7 +289,7 @@ const evaluation = ({ route, navigation }) => {
         </View>
       </View>
 
-      <Text style={styles.header}>Trip Evaluation</Text>
+      <Text style={styles.header}>Trip and Driver Evaluation</Text>
 
       {showQuestions ? renderQuestionsForm() : renderStationAndBusForm()}
     </ScrollView>
